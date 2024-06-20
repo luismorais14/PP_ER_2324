@@ -1,11 +1,11 @@
 /*
-* Nome: <Nome completo do aluno>
-* Número: <Número mecanográfico do aluno>
-* Turma: <Turma do aluno>
+* Nome: Francisco Morais de Oliveira
+* Número: 8230204
+* Turma: T3
 *
-* Nome: <Nome completo do colega de grupo>
-* Número: <Número mecanográfico do colega de grupo>
-* Turma: <Turma do colega de grupo>
+* Nome: Luís André Nunes Morais
+* Número: 8230258
+* Turma: T3
 */
 package pp_er_2324;
 
@@ -15,7 +15,7 @@ public class PP_ER_2324 {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
+        
     }
     
 }
