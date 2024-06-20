@@ -1,6 +1,11 @@
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+* Nome: Francisco Morais de Oliveira
+* Número: 8230204
+* Turma: T3
+*
+* Nome: Luís André Nunes Morais
+* Número: 8230258
+* Turma: T3
  */
 package pp_er_2324;
 
@@ -22,7 +27,7 @@ import java.time.LocalDateTime;
  *
  * @author Luís Morais
  */
-public class InstitutionImpl implements Institution{
+public class InstitutionImpl implements Institution {
 
     @Override
     public String getName() {
@@ -93,5 +98,5 @@ public class InstitutionImpl implements Institution{
     public double getDistance(AidBox aidbox) throws AidBoxException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
-    
+
 }
