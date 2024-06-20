@@ -269,7 +269,6 @@ public class AidBoxImpl implements AidBox {
             return null;
         }
 
-        Container cntnr = (Container) super.clone();
 
         Container[] newContainer = new Container[this.container.length];
 
