@@ -7,57 +7,46 @@
 * Número: 8230258
 * Turma: T3
  */
-package pp_er_2324;
+package management;
 
-import com.estg.core.AidBox;
-import com.estg.core.Container;
-import com.estg.core.ContainerType;
-import com.estg.core.exceptions.AidBoxException;
-import com.estg.core.exceptions.ContainerException;
+import com.estg.pickingManagement.Report;
+import java.time.LocalDateTime;
 
-/**
- *
- * @author Luís Morais
- */
-public class AidBoxImpl implements AidBox {
+
+public class ReportImpl implements Report {
 
     @Override
-    public String getCode() {
+    public int getUsedVehicles() {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public String getZone() {
+    public int getPickedContainers() {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public double getDistance(AidBox aidbox) throws AidBoxException {
+    public double getTotalDistance() {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public double getDuration(AidBox aidbox) throws AidBoxException {
+    public double getTotalDuration() {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public boolean addContainer(Container cntnr) throws ContainerException {
+    public int getNonPickedContainers() {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public Container getContainer(ContainerType ct) {
+    public int getNotUsedVehicles() {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public Container[] getContainers() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    @Override
-    public void removeContainer(Container cntnr) throws AidBoxException {
+    public LocalDateTime getDate() {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 

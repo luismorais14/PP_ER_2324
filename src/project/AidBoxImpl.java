@@ -7,67 +7,54 @@
 * Número: 8230258
 * Turma: T3
  */
-package pp_er_2324;
+package project;
 
 import com.estg.core.AidBox;
-import com.estg.pickingManagement.Report;
-import com.estg.pickingManagement.Route;
-import com.estg.pickingManagement.Vehicle;
-import com.estg.pickingManagement.exceptions.RouteException;
+import com.estg.core.Container;
+import com.estg.core.ContainerType;
+import com.estg.core.exceptions.AidBoxException;
+import com.estg.core.exceptions.ContainerException;
 
-/**
- *
- * @author Luís Morais
- */
-public class RouteImpl implements Route {
+
+public class AidBoxImpl implements AidBox {
 
     @Override
-    public void addAidBox(AidBox aidbox) throws RouteException {
+    public String getCode() {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public AidBox removeAidBox(AidBox aidbox) throws RouteException {
+    public String getZone() {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public boolean containsAidBox(AidBox aidbox) {
+    public double getDistance(AidBox aidbox) throws AidBoxException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public void replaceAidBox(AidBox aidbox, AidBox aidbox1) throws RouteException {
+    public double getDuration(AidBox aidbox) throws AidBoxException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public void insertAfter(AidBox aidbox, AidBox aidbox1) throws RouteException {
+    public boolean addContainer(Container cntnr) throws ContainerException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public AidBox[] getRoute() {
+    public Container getContainer(ContainerType ct) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public Vehicle getVehicle() {
+    public Container[] getContainers() {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public double getTotalDistance() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    @Override
-    public double getTotalDuration() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    @Override
-    public Report getReport() {
+    public void removeContainer(Container cntnr) throws AidBoxException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 

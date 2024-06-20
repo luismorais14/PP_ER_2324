@@ -7,16 +7,14 @@
 * Número: 8230258
 * Turma: T3
  */
-package pp_er_2324;
+package management;
 
-import com.estg.core.Measurement;
+import com.estg.pickingManagement.PickingMap;
+import com.estg.pickingManagement.Route;
 import java.time.LocalDateTime;
 
-/**
- *
- * @author Luís Morais
- */
-public class MeasurementImpl implements Measurement {
+
+public class PickingMapImpl implements PickingMap {
 
     @Override
     public LocalDateTime getDate() {
@@ -24,7 +22,7 @@ public class MeasurementImpl implements Measurement {
     }
 
     @Override
-    public double getValue() {
+    public Route[] getRoutes() {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 

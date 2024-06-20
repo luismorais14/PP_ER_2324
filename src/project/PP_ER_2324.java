@@ -7,13 +7,10 @@
 * Número: 8230258
 * Turma: T3
 */
-package pp_er_2324;
+package project;
 
 public class PP_ER_2324 {
 
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String[] args) {
         
     }

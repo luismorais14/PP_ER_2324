@@ -7,24 +7,49 @@
 * Número: 8230258
 * Turma: T3
  */
-package pp_er_2324;
+package management;
 
+import com.estg.core.AidBox;
 import com.estg.pickingManagement.Report;
-import java.time.LocalDateTime;
+import com.estg.pickingManagement.Route;
+import com.estg.pickingManagement.Vehicle;
+import com.estg.pickingManagement.exceptions.RouteException;
 
-/**
- *
- * @author Luís Morais
- */
-public class ReportImpl implements Report {
+
+public class RouteImpl implements Route {
 
     @Override
-    public int getUsedVehicles() {
+    public void addAidBox(AidBox aidbox) throws RouteException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public int getPickedContainers() {
+    public AidBox removeAidBox(AidBox aidbox) throws RouteException {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public boolean containsAidBox(AidBox aidbox) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public void replaceAidBox(AidBox aidbox, AidBox aidbox1) throws RouteException {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public void insertAfter(AidBox aidbox, AidBox aidbox1) throws RouteException {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public AidBox[] getRoute() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public Vehicle getVehicle() {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
@@ -39,17 +64,7 @@ public class ReportImpl implements Report {
     }
 
     @Override
-    public int getNonPickedContainers() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    @Override
-    public int getNotUsedVehicles() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    @Override
-    public LocalDateTime getDate() {
+    public Report getReport() {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 

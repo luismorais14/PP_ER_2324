@@ -7,7 +7,7 @@
 * Número: 8230258
 * Turma: T3
  */
-package pp_er_2324;
+package project;
 
 import com.estg.core.Container;
 import com.estg.core.ContainerType;
@@ -15,10 +15,7 @@ import com.estg.core.Measurement;
 import com.estg.core.exceptions.MeasurementException;
 import java.time.LocalDate;
 
-/**
- *
- * @author Luís Morais
- */
+
 public class ContainerImpl implements Container {
 
     @Override

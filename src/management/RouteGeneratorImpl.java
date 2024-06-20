@@ -7,22 +7,17 @@
 * Número: 8230258
 * Turma: T3
  */
-package pp_er_2324;
+package management;
 
 import com.estg.core.Institution;
-import com.estg.core.exceptions.InstitutionException;
-import com.estg.io.Importer;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import com.estg.pickingManagement.Route;
+import com.estg.pickingManagement.RouteGenerator;
 
-/**
- *
- * @author Luís Morais
- */
-public class ImporterImpl implements Importer {
+
+public class RouteGeneratorImpl implements RouteGenerator {
 
     @Override
-    public void importData(Institution instn) throws FileNotFoundException, IOException, InstitutionException {
+    public Route[] generateRoutes(Institution instn) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 

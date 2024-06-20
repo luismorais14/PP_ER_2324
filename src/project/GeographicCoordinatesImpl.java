@@ -7,12 +7,9 @@
 * Número: 8230258
 * Turma: T3
  */
-package pp_er_2324;
+package project;
 
-/**
- *
- * @author Luís Morais
- */
-public class RouteValidatorImpl implements RouteValidator {
+
+public class GeographicCoordinatesImpl implements GeographicCoordinates {
 
 }
