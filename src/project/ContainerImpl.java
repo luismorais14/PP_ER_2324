@@ -13,10 +13,73 @@ import com.estg.core.Container;
 import com.estg.core.ContainerType;
 import com.estg.core.Measurement;
 import com.estg.core.exceptions.MeasurementException;
+import com.estg.io.HTTPProvider;
+
 import java.time.LocalDate;
 import java.util.Objects;
 
 public class ContainerImpl implements Container {
+    private final int ARRAY_SIZE = 10;
+
+    private ContainerType containerType;
+    private double capacity;
+    private Measurement[] measurements;
+    private static int nMeasurements = 0;
+    private String code;
+    private HTTPProvider httpprovider;
+
+    /**Construtor de Container
+     *
+     */
+    public ContainerImpl() {
+        this.containerType = null;
+        this.capacity = 0.0;
+        this.measurements = new Measurement[ARRAY_SIZE];
+        this.code = null;
+        this.httpprovider = new HTTPProvider();
+    }
+    /**Construtor de Container
+     *
+     * @param it Tipo do container
+     * @param capacity capacidade do conteiner
+     * @param measurements array de medições
+     * @param code Coordenadas da Aidbox
+     */
+    public ContainerImpl(ContainerType it, double capacity, Measurement[] measurements, String code) {
+        this.containerType = it;
+        this.capacity = capacity;
+        this.measurements = measurements;
+        this.code = code;
+        this.httpprovider = new HTTPProvider();
+    }
+    /**Metodo responsável por especificar o código do container
+     *
+     * @param code código do container
+     */
+    public void setCode(String code) {
+        this.code = code;
+    }
+    /**Metodo responsável por especificar o tipo do container
+     *
+     * @param itemType tipo do container
+     */
+    public void setItemType(ContainerType itemType) {
+        this.containerType = itemType;
+    }
+    /**Metodo responsável por especificar o tipo do container
+     *
+     * @param capacity tipo do container
+     */
+    public void setCapacity(double capacity) {
+        this.capacity = capacity;
+    }
+    /**Metodo responsável por especificar o tipo do container
+     *
+     * @param measurements array de medições
+     */
+    public void setMeasurements(Measurement[] measurements) {
+        this.measurements = measurements;
+    }
 
     @Override
     public String getCode() {

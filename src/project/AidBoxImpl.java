@@ -12,6 +12,7 @@ package project;
 import com.estg.core.AidBox;
 import com.estg.core.Container;
 import com.estg.core.ContainerType;
+import com.estg.core.Measurement;
 import com.estg.core.exceptions.AidBoxException;
 import com.estg.core.exceptions.ContainerException;
 import com.estg.io.HTTPProvider;
@@ -157,7 +158,7 @@ public class AidBoxImpl implements AidBox {
 
     @Override
     public Container[] getContainers() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        return deepCopyContainers(this.container);
     }
 
     @Override
@@ -169,7 +170,7 @@ public class AidBoxImpl implements AidBox {
         } else if (!this.checkContainerExistence(cntnr)) {
             throw new AidBoxException("Container does not exist");
         }
-        if (index == this.container.length) {
+        if (index == nContainers) {
             this.container[index] = null;
             nContainers--;
         } else {
@@ -256,6 +257,53 @@ public class AidBoxImpl implements AidBox {
             }
         }
         return index;
+    }
+
+    /**Método que cria uma (deep) copy da coleção de containers
+     *
+     * @param container a coleção de containers a fazer uma (deep) copy
+     * @return a (deep) copy da coleção de containers
+     */
+    private Container[] deepCopyContainers(Container[] container) {
+        if (container == null) {
+            return null;
+        }
+
+        Container cntnr = (Container) super.clone();
+
+        Container[] newContainer = new Container[this.container.length];
+
+        for (int i = 0; i < this.container.length; i++) {
+            Container original = container[i];
+            if (original != null) {
+                ContainerImpl copy = new ContainerImpl();
+
+                copy.setCapacity(original.getCapacity());
+                copy.setCode(original.getCode());
+                copy.setItemType(original.getType());
+
+                Measurement[] newMeasurement = new Measurement[original.getMeasurements().length];
+                Measurement[] originalMeasurement = original.getMeasurements();
+                for (int j = 0; j < originalMeasurement.length; j++) {
+                    Measurement originalMeasurements = originalMeasurement[j];
+                    MeasurementImpl copyMeasurement = new MeasurementImpl();
+
+                    if (originalMeasurements != null) {
+                        copyMeasurement.setDate(originalMeasurements.getDate());
+                        copyMeasurement.setMeasurementValue(originalMeasurements.getValue());
+
+                        newMeasurement[j] = copyMeasurement;
+                    }
+                }
+                copy.setMeasurements(newMeasurement);
+
+                newContainer[i] = copy;
+            } else {
+                newContainer[i] = null;
+            }
+        }
+
+        return newContainer;
     }
 
     @Override
