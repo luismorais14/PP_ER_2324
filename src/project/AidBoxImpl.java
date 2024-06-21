@@ -57,6 +57,22 @@ public class AidBoxImpl implements AidBox {
     }
 
     /**
+     * Método responsável por especificar o código da AidBox
+     * @param code o código da AidBox
+     */
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    /**
+     * Método responsável por especificar a zona da AidBox
+     * @param zone a zona da AidBox
+     */
+    public void setZone(String zone) {
+        this.zone = zone;
+    }
+
+    /**
      * Metodo responsável por retornar o código da AidBox
      *
      * @return código da AidBox

@@ -1,16 +1,18 @@
 /*
-* Nome: Francisco Morais de Oliveira
-* Número: 8230204
-* Turma: T3
-*
-* Nome: Luís André Nunes Morais
-* Número: 8230258
-* Turma: T3
+ * Nome: Francisco Morais de Oliveira
+ * Número: 8230204
+ * Turma: T3
+ *
+ * Nome: Luís André Nunes Morais
+ * Número: 8230258
+ * Turma: T3
  */
 package project;
 
 import com.estg.core.Measurement;
+
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 
 public class MeasurementImpl implements Measurement {
@@ -20,7 +22,6 @@ public class MeasurementImpl implements Measurement {
 
     /**
      * Construtor de Measurement
-     *
      */
     public MeasurementImpl() {
         this.date = null;
@@ -31,7 +32,7 @@ public class MeasurementImpl implements Measurement {
      * Construtor de Measurement
      *
      * @param date hórario de medição
-     * @param mv valor da medição
+     * @param mv   valor da medição
      */
     public MeasurementImpl(LocalDateTime date, double mv) {
         this.date = date;
@@ -82,4 +83,27 @@ public class MeasurementImpl implements Measurement {
                 + "\nMeasurement Value: " + this.getValue();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        MeasurementImpl other = (MeasurementImpl) o;
+        if (this.measurementValue != other.measurementValue || !Objects.equals(this.date, other.date)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        MeasurementImpl clone = (MeasurementImpl) super.clone();
+        clone.setDate(this.getDate());
+        clone.setMeasurementValue(this.getValue());
+        return clone;
+    }
 }
