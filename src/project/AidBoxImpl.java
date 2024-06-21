@@ -86,8 +86,35 @@ public class AidBoxImpl implements AidBox {
      */
     @Override
     public double getDistance(AidBox aidbox) throws AidBoxException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        if (aidbox == null) {
+            throw new AidBoxException("AidBox is null");
+        }
 
+        JSONArray ja;
+        JSONArray aidboxes;
+        JSONParser parser = new JSONParser();
+        String jsonString = this.httpprovider.getFromURL("https://data.mongodb-api.com/app/data-docuz/endpoint/distances");
+        double distance = 0.0;
+        try {
+            ja = (JSONArray) parser.parse(jsonString);
+            for (int i = 0; i < ja.size(); i++) {
+                JSONObject jsonObject = (JSONObject) ja.get(i);
+                String originalAidBox = (String) jsonObject.get("from");
+                if (originalAidBox.compareTo(this.getCode()) == 0) {
+                    aidboxes = (JSONArray) jsonObject.get("to");
+                    for (int j = 0; j < aidboxes.size(); j++) {
+                        JSONObject aidboxObject = (JSONObject) aidboxes.get(j);
+                        String aidboxCode = (String) aidboxObject.get("name");
+                        if (aidboxCode.compareTo(aidbox.getCode()) == 0) {
+                            distance = (double) aidboxObject.get("distance");
+                        }
+                    }
+                }
+            }
+        } catch (ParseException ex) {
+            System.out.println(ex.getMessage());
+        }
+        return distance;
     }
 
     /**
@@ -99,7 +126,35 @@ public class AidBoxImpl implements AidBox {
      */
     @Override
     public double getDuration(AidBox aidbox) throws AidBoxException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        if (aidbox == null) {
+            throw new AidBoxException("AidBox is null");
+        }
+
+        JSONArray ja;
+        JSONArray aidboxes;
+        JSONParser parser = new JSONParser();
+        String jsonString = this.httpprovider.getFromURL("https://data.mongodb-api.com/app/data-docuz/endpoint/distances");
+        double duration = 0.0;
+        try {
+            ja = (JSONArray) parser.parse(jsonString);
+            for (int i = 0; i < ja.size(); i++) {
+                JSONObject jsonObject = (JSONObject) ja.get(i);
+                String originalAidBox = (String) jsonObject.get("from");
+                if (originalAidBox.compareTo(this.getCode()) == 0) {
+                    aidboxes = (JSONArray) jsonObject.get("to");
+                    for (int j = 0; j < aidboxes.size(); j++) {
+                        JSONObject aidboxObject = (JSONObject) aidboxes.get(j);
+                        String aidboxCode = (String) aidboxObject.get("name");
+                        if (aidboxCode.compareTo(aidbox.getCode()) == 0) {
+                            duration = (double) aidboxObject.get("duration");
+                        }
+                    }
+                }
+            }
+        } catch (ParseException ex) {
+            System.out.println(ex.getMessage());
+        }
+        return duration;
     }
 
     /**
@@ -145,11 +200,22 @@ public class AidBoxImpl implements AidBox {
         return tmpContainer;
     }
 
+    /**
+     * Método que retorna uma (deep) copy dos containers na aidbox
+     *
+     * @return uma (deep) copy dos containers na aidbox
+     */
     @Override
     public Container[] getContainers() {
         return deepCopyContainers(this.containerManagement.getContainers());
     }
 
+    /**
+     * Método responsável por remover um container da coleção
+     *
+     * @param cntnr o container a ser removido
+     * @throws AidBoxException se o container recebido como parâmetro não existir
+     */
     @Override
     public void removeContainer(Container cntnr) throws AidBoxException {
         if (cntnr == null) {

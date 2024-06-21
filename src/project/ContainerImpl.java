@@ -124,7 +124,7 @@ public class ContainerImpl implements Container {
         }
         final Container other = (Container) obj;
 
-        if (!Objects.equals(this.getType(), other.getType())) {
+        if (!obj.equals(this.getType())) {
             return false;
         }
         return true;
