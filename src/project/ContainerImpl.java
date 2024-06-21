@@ -172,7 +172,7 @@ public class ContainerImpl implements Container {
         }
         final Container other = (Container) obj;
 
-        if (!obj.equals(this.getType())) {
+        if (!this.getType().equals(other.getType())) { // Alterei !obj.equals(this.getType())
             return false;
         }
         return true;
@@ -218,7 +218,7 @@ public class ContainerImpl implements Container {
         if (!this.getType().equals(other.getType())) {
             return false;
         }
-        if (this.getCode().compareTo(other.getCode()) != 0) {
+        if (this.getCode().equals(other.getCode())) { // Alterei o compareTo
             return false;
         }
 
