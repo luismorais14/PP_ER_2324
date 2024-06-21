@@ -91,22 +91,24 @@ public class AidBoxImpl implements AidBox {
         }
 
         JSONArray ja;
-        JSONArray aidboxes;
         JSONParser parser = new JSONParser();
         String jsonString = this.httpprovider.getFromURL("https://data.mongodb-api.com/app/data-docuz/endpoint/distances");
         double distance = 0.0;
         try {
             ja = (JSONArray) parser.parse(jsonString);
-            for (int i = 0; i < ja.size(); i++) {
-                JSONObject jsonObject = (JSONObject) ja.get(i);
+            for (Object obj : ja) {
+                JSONObject jsonObject = (JSONObject) obj;
                 String originalAidBox = (String) jsonObject.get("from");
                 if (originalAidBox.compareTo(this.getCode()) == 0) {
-                    aidboxes = (JSONArray) jsonObject.get("to");
-                    for (int j = 0; j < aidboxes.size(); j++) {
-                        JSONObject aidboxObject = (JSONObject) aidboxes.get(j);
+                    JSONArray aidboxes = (JSONArray) jsonObject.get("to");
+                    for (Object aidboxesObj : aidboxes) {
+                        JSONObject aidboxObject = (JSONObject) aidboxesObj;
                         String aidboxCode = (String) aidboxObject.get("name");
                         if (aidboxCode.compareTo(aidbox.getCode()) == 0) {
-                            distance = (double) aidboxObject.get("distance");
+                            Object distanceObj = aidboxObject.get("distance");
+                            if (distanceObj instanceof Number) {
+                                distance = ((Number) distanceObj).doubleValue();
+                            }
                         }
                     }
                 }
@@ -146,7 +148,10 @@ public class AidBoxImpl implements AidBox {
                         JSONObject aidboxObject = (JSONObject) aidboxes.get(j);
                         String aidboxCode = (String) aidboxObject.get("name");
                         if (aidboxCode.compareTo(aidbox.getCode()) == 0) {
-                            duration = (double) aidboxObject.get("duration");
+                            Object durationObj = aidboxObject.get("duration");
+                            if (durationObj instanceof Number) {
+                                duration = ((Number) durationObj).doubleValue();
+                            }
                         }
                     }
                 }
