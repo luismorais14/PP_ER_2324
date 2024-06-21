@@ -293,6 +293,23 @@ public class AidBoxImpl implements AidBox {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (this == obj){
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        AidBoxImpl other = (AidBoxImpl) obj;
+        if (this.code.compareTo(other.getCode()) != 0){
+            return false;
+        }
+        return true;
+    }
+
+
+
+    @Override
     public String toString() {
 
         return "Code: " + this.code

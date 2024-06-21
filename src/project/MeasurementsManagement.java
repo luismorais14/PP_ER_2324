@@ -1,3 +1,12 @@
+/*
+ * Nome: Francisco Morais de Oliveira
+ * Número: 8230204
+ * Turma: T3
+ *
+ * Nome: Luís André Nunes Morais
+ * Número: 8230258
+ * Turma: T3
+ */
 package project;
 
 import com.estg.core.Container;
@@ -10,7 +19,7 @@ public class MeasurementsManagement {
     private final int ARRAY_SIZE = 10;
 
     private Measurement[] measurements;
-    private static int nMeasurements;
+    private static int nMeasurements = 0;
 
 
     /**
@@ -18,7 +27,6 @@ public class MeasurementsManagement {
      */
     public MeasurementsManagement() {
         measurements = new Measurement[ARRAY_SIZE];
-        nMeasurements = 0;
     }
 
     /**
@@ -61,7 +69,6 @@ public class MeasurementsManagement {
         if (nMeasurements == this.measurements.length - 1) {
             expandMeasurementsArray();
         }
-
         this.measurements[nMeasurements] = measurement;
         nMeasurements++;
 

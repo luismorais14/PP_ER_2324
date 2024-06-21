@@ -1,3 +1,12 @@
+/*
+ * Nome: Francisco Morais de Oliveira
+ * Número: 8230204
+ * Turma: T3
+ *
+ * Nome: Luís André Nunes Morais
+ * Número: 8230258
+ * Turma: T3
+ */
 package project;
 
 import com.estg.core.Container;
@@ -7,14 +16,13 @@ public class ContainerManagement {
     private final int ARRAY_SIZE = 10;
 
     private Container[] containers;
-    private static int nContainers;
+    private static int nContainers = 0;
 
     /**
      * Método construtor de ContainerManagement
      */
     public ContainerManagement() {
         containers = new Container[ARRAY_SIZE];
-        nContainers = 0;
     }
 
     /**

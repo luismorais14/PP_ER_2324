@@ -159,7 +159,6 @@ public class ContainerImpl implements Container {
      * @param obj container a ser verificado o tipo
      * @return o sucesso ou insucesso da operação
      */
-    //Alterar o .equals dos tipos
     public boolean verifyContainerType(Object obj) {
         if (this == obj) {
             return true;
@@ -172,7 +171,7 @@ public class ContainerImpl implements Container {
         }
         final Container other = (Container) obj;
 
-        if (!this.getType().equals(other.getType())) { // Alterei !obj.equals(this.getType())
+        if (!this.getType().equals(other.getType())) {
             return false;
         }
         return true;
@@ -218,7 +217,7 @@ public class ContainerImpl implements Container {
         if (!this.getType().equals(other.getType())) {
             return false;
         }
-        if (this.getCode().equals(other.getCode())) { // Alterei o compareTo
+        if (this.getCode().compareTo(other.getCode()) != 0) {
             return false;
         }
 
