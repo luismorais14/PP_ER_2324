@@ -111,6 +111,7 @@ public class ContainerImpl implements Container {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
+    //Alterar o .equals dos tipos
     public boolean verifyContainerType(Object obj) {
         if (this == obj) {
             return true;
@@ -142,7 +143,7 @@ public class ContainerImpl implements Container {
         }
         final Container other = (Container) obj;
 
-        if (!Objects.equals(this.getType(), other.getType())) {
+        if (!this.getType().equals(other.getType())) {
             return false;
         }
         if (this.getCode().compareTo(other.getCode()) != 0) {
@@ -151,5 +152,16 @@ public class ContainerImpl implements Container {
 
         return true;
     }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        ContainerImpl clone = (ContainerImpl) super.clone();
+        clone.setCapacity(this.getCapacity());
+        clone.setCode(this.getCode());
+        clone.setItemType(this.getType());
+        clone.setMeasurements(this.getMeasurements());
+        return clone;
+    }
+
 
 }

@@ -1,11 +1,11 @@
 /*
-* Nome: Francisco Morais de Oliveira
-* Número: 8230204
-* Turma: T3
-*
-* Nome: Luís André Nunes Morais
-* Número: 8230258
-* Turma: T3
+ * Nome: Francisco Morais de Oliveira
+ * Número: 8230204
+ * Turma: T3
+ *
+ * Nome: Luís André Nunes Morais
+ * Número: 8230258
+ * Turma: T3
  */
 package project;
 
@@ -16,7 +16,9 @@ import com.estg.core.Measurement;
 import com.estg.core.exceptions.AidBoxException;
 import com.estg.core.exceptions.ContainerException;
 import com.estg.io.HTTPProvider;
+
 import java.util.Objects;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -28,22 +30,17 @@ public class AidBoxImpl implements AidBox {
 
     private String code;
     private String zone;
-    private String refLocal;
-    private Container[] container;
-    private static int nContainers;
     private HTTPProvider httpprovider;
+    private ContainerManagement containerManagement;
 
     /**
      * Construtor de AidBox
-     *
      */
     public AidBoxImpl() {
         this.code = null;
         this.zone = null;
-        this.refLocal = null;
         this.httpprovider = new HTTPProvider();
-        this.container = new Container[ARRAY_SIZE];
-        nContainers = 0;
+        this.containerManagement = new ContainerManagement();
     }
 
     /**
@@ -51,15 +48,12 @@ public class AidBoxImpl implements AidBox {
      *
      * @param code código da AidBox
      * @param zone Zona da AidBox
-     * @param refLocal referência do local da AidBox
-     *
      */
-    public AidBoxImpl(String code, String zone, String refLocal) {
+    public AidBoxImpl(String code, String zone) {
         this.code = code;
         this.zone = zone;
         this.httpprovider = new HTTPProvider();
-        this.container = new Container[ARRAY_SIZE];
-        nContainers = 0;
+        this.containerManagement = new ContainerManagement();
     }
 
     /**
@@ -87,8 +81,8 @@ public class AidBoxImpl implements AidBox {
      * parâmetro aidbox
      *
      * @param aidbox aidbox para calcular a distância
-     * @throws AidBoxException exceção a ser lançada se a aidbox não existir
      * @return a distância entre a aidbox atual e a recebida como parâmetro
+     * @throws AidBoxException exceção a ser lançada se a aidbox não existir
      */
     @Override
     public double getDistance(AidBox aidbox) throws AidBoxException {
@@ -96,6 +90,13 @@ public class AidBoxImpl implements AidBox {
 
     }
 
+    /**
+     * Método responsável por retornar a duração entre a aidbox atual e a aidbox recebida como parâmetro
+     *
+     * @param aidbox aidbox a calcular a duração
+     * @return a duração entre as aidboxes
+     * @throws AidBoxException se a aidbox não existir
+     */
     @Override
     public double getDuration(AidBox aidbox) throws AidBoxException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
@@ -107,29 +108,17 @@ public class AidBoxImpl implements AidBox {
      * @param cntnr o contentor a adicionar
      * @return retorna o sucesso ou o insucesso da operação
      * @throws ContainerException exceção a ser lançada caso o container a
-     * inserir seja null ou se a aidbox já possui um container de um determinado
-     * tipo
+     *                            inserir seja null ou se a aidbox já possui um container de um determinado
+     *                            tipo
      */
     @Override
     public boolean addContainer(Container cntnr) throws ContainerException {
-        boolean aux = true;
         if (cntnr == null) {
             throw new ContainerException("Container is null");
-        } else if (verifyContainerType(cntnr)) {
+        } else if (this.containerManagement.verifyContainerType(cntnr)) {
             throw new ContainerException("The AidBox already have a container from a given type");
         }
-        if (nContainers == this.container.length - 1) {
-            expandContainerArray();
-        }
-
-        if (checkContainerExistence(cntnr)) {
-            aux = false;
-        } else {
-            this.container[nContainers] = cntnr;
-            nContainers++;
-        }
-
-        return aux;
+        return this.containerManagement.addContainer(cntnr);
     }
 
     /**
@@ -144,89 +133,32 @@ public class AidBoxImpl implements AidBox {
         boolean aux = false;
         Container tmpContainer = null;
 
-        for (int i = 0; i < nContainers; i++) {
-            if (this.container[i].getType().equals(it)) {
+        for (int i = 0; i < ContainerManagement.getnContainers(); i++) {
+            if (this.containerManagement.getContainers()[i].getType().equals(it)) {
                 index = i;
                 aux = true;
             }
         }
         if (aux) {
-            tmpContainer = this.container[index];
+            tmpContainer = this.containerManagement.getContainers()[index];
         }
         return tmpContainer;
     }
 
     @Override
     public Container[] getContainers() {
-        return deepCopyContainers(this.container);
+        return deepCopyContainers(this.containerManagement.getContainers());
     }
 
     @Override
     public void removeContainer(Container cntnr) throws AidBoxException {
-
-        int index = findContainer(cntnr);
         if (cntnr == null) {
             throw new AidBoxException("Container is null");
-        } else if (!this.checkContainerExistence(cntnr)) {
+        } else if (!this.containerManagement.checkContainerExistence(cntnr)) {
             throw new AidBoxException("Container does not exist");
         }
-        if (index == nContainers) {
-            this.container[index] = null;
-            nContainers--;
-        } else {
-            for (int i = index; i < this.container.length - index - 1; i++) {
-                this.container[i] = this.container[i + 1];
-            }
-            nContainers--;
-        }
 
-    }
-
-    /**
-     * método responsável por aumentar o tamanho da coleção de containers
-     *
-     */
-    public void expandContainerArray() {
-        Container[] newArray = new Container[this.container.length + 5];
-        for (int i = 0; i < nContainers; i++) {
-            newArray[i] = container[i];
-        }
-        this.container = newArray;
-    }
-
-    /**
-     * Método responsável por verificar se um container já existe na coleção
-     *
-     * @param cntnr container a verificar
-     * @return o sucesso ou insucesso da operação
-     */
-    private boolean checkContainerExistence(Container cntnr) {
-        boolean aux = false;
-        for (Container container1 : container) {
-            if (container1 != null && cntnr != null) {
-                if (container1.getCode().compareTo(cntnr.getCode()) == 0) {
-                    aux = true;
-                }
-            }
-        }
-        return aux;
-    }
-
-    public boolean verifyContainerType(Container container) {
-        if (container == null) {
-            return false;
-        }
-
-        for (int i = 0; i < this.container.length; i++) {
-            ContainerImpl tempContainer = (ContainerImpl) this.container[i];
-            if (tempContainer != null) {
-                if (tempContainer.verifyContainerType(container)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        this.containerManagement.removeContainer(cntnr);
     }
 
     /**
@@ -241,7 +173,7 @@ public class AidBoxImpl implements AidBox {
         }
 
         String result = "";
-        for (int i = 0; i < this.container.length; i++) {
+        for (int i = 0; i < this.containerManagement.getContainers().length; i++) {
             if (containers[i] != null) {
                 result += containers[i].toString() + "\n";
             }
@@ -249,17 +181,9 @@ public class AidBoxImpl implements AidBox {
         return result;
     }
 
-    private int findContainer(Container container) {
-        int index = -1;
-        for (int i = 0; i < this.container.length; i++) {
-            if (this.container[i].equals(container)) {
-                index = i;
-            }
-        }
-        return index;
-    }
 
-    /**Método que cria uma (deep) copy da coleção de containers
+    /**
+     * Método que cria uma (deep) copy da coleção de containers
      *
      * @param container a coleção de containers a fazer uma (deep) copy
      * @return a (deep) copy da coleção de containers
@@ -268,38 +192,14 @@ public class AidBoxImpl implements AidBox {
         if (container == null) {
             return null;
         }
-
-
-        Container[] newContainer = new Container[this.container.length];
-
-        for (int i = 0; i < this.container.length; i++) {
-            Container original = container[i];
-            if (original != null) {
-                ContainerImpl copy = new ContainerImpl();
-
-                copy.setCapacity(original.getCapacity());
-                copy.setCode(original.getCode());
-                copy.setItemType(original.getType());
-
-                Measurement[] newMeasurement = new Measurement[original.getMeasurements().length];
-                Measurement[] originalMeasurement = original.getMeasurements();
-                for (int j = 0; j < originalMeasurement.length; j++) {
-                    Measurement originalMeasurements = originalMeasurement[j];
-                    MeasurementImpl copyMeasurement = new MeasurementImpl();
-
-                    if (originalMeasurements != null) {
-                        copyMeasurement.setDate(originalMeasurements.getDate());
-                        copyMeasurement.setMeasurementValue(originalMeasurements.getValue());
-
-                        newMeasurement[j] = copyMeasurement;
-                    }
-                }
-                copy.setMeasurements(newMeasurement);
-
-                newContainer[i] = copy;
-            } else {
-                newContainer[i] = null;
+        Container[] newContainer = new Container[container.length];
+        try {
+            for (int i = 0; i < newContainer.length; i++) {
+                ContainerImpl container1 = (ContainerImpl) container[i];
+                newContainer[i] = (Container) container1.clone();
             }
+        } catch (CloneNotSupportedException ex) {
+            System.out.println(ex.getMessage());
         }
 
         return newContainer;
@@ -310,7 +210,7 @@ public class AidBoxImpl implements AidBox {
 
         return "Code: " + this.code
                 + "\nZone: " + this.zone
-                + "\nContentores: " + showContainers(this.container);
+                + "\nContentores: " + showContainers(this.containerManagement.getContainers());
 
     }
 }
