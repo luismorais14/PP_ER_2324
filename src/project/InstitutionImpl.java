@@ -31,9 +31,9 @@ public class InstitutionImpl implements Institution {
 
     private String InstitutionName;
     private PickingMap[] pickingMaps;
-    private AidBoxManagement aidboxes;
+    private AidBoxManagement aidboxes = new AidBoxManagement();
     private static int nAidBox;
-    private MeasurementsManagement measurements;
+    private MeasurementsManagement measurements = new MeasurementsManagement();
     private static int nMeasurement;
     private Vehicle[] enableVehicles;
     private Vehicle[] disableVehicles;
@@ -49,8 +49,6 @@ public class InstitutionImpl implements Institution {
     public InstitutionImpl() {
         this.InstitutionName = null;
         this.pickingMaps = new PickingMap[ARRAY_SIZE];
-        this.aidboxes = new AidBoxManagement();
-        this.measurements = new MeasurementsManagement();
         this.enableVehicles = new Vehicle[ARRAY_SIZE];
         this.disableVehicles = new Vehicle[ARRAY_SIZE];
         this.enableVehicles = new Vehicle[ARRAY_SIZE];
@@ -71,11 +69,11 @@ public class InstitutionImpl implements Institution {
      * @param measurement as medições associadas à instituição
      * @param vehicle os veículos associados à instituição
      */
-    public InstitutionImpl(String name, PickingMap[] pm, AidBoxManagement aidbox, MeasurementsManagement measurement, Vehicle[] vehicle) {
+    public InstitutionImpl(String name, PickingMap[] pm, AidBox[] aidbox, Measurement[] measurement, Vehicle[] vehicle) {
         this.InstitutionName = name;
         this.pickingMaps = pm;
-        this.aidboxes = aidbox;
-        this.measurements = measurement;
+        this.aidboxes.setAidBox(aidbox);
+        this.measurements.setMeasurements(measurement);
         this.enableVehicles = vehicle;
         this.httpProvider = new HTTPProvider();
         this.disableVehicles = new Vehicle[ARRAY_SIZE];
@@ -182,7 +180,7 @@ public class InstitutionImpl implements Institution {
 
     @Override
     public AidBox[] getAidBoxes() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        return this.deepCopyAidBoxes(this.aidboxes.getAidBoxes());
     }
 
     @Override
@@ -253,6 +251,31 @@ public class InstitutionImpl implements Institution {
             }
         }
         return index;
+    }
+
+    /**
+     * Método que cria uma (deep) copy da coleção de aidboxes
+     *
+     * @param aidbox a coleção de aidboxes a fazer uma (deep) copy
+     * @return a (deep) copy da coleção de aidboxes
+     */
+    public AidBox[] deepCopyAidBoxes(AidBox[] aidbox) {
+        if (aidbox == null) {
+            return null;
+        }
+        AidBox[] newAidBox = new AidBox[aidbox.length];
+        try {
+            for (int i = 0; i < newAidBox.length; i++) {
+                if (aidbox[i] != null) {
+                    AidBoxImpl aidbox1 = (AidBoxImpl) aidbox[i];
+                    newAidBox[i] = (AidBoxImpl) aidbox1.clone();
+                }
+            }
+        } catch (CloneNotSupportedException ex) {
+            System.out.println(ex.getMessage());
+        }
+
+        return newAidBox;
     }
 
 }

@@ -69,6 +69,12 @@ public class MeasurementsManagement {
         if (nMeasurements == this.measurements.length - 1) {
             expandMeasurementsArray();
         }
+        for (int i = 0; i < nMeasurements; i++) {
+            if (measurements[i].getDate().equals(measurement.getDate())) {
+                return false;
+            }
+        }
+
         this.measurements[nMeasurements] = measurement;
         nMeasurements++;
 
@@ -161,18 +167,18 @@ public class MeasurementsManagement {
      * @param msrmnt uma medição
      * @return um array de medições com a mesma data da do parametro
      */
-    public int[] Searchbydate(Measurement msrmnt) {
+    public int[] searchbydate(Measurement msrmnt) {
         int counter = 0;
-        int Temppositions[] = new int[nMeasurements];
+        int[] tempPositions = new int[nMeasurements];
         for (int i = 0; i < nMeasurements; i++) {
             if (measurements[i].getDate().isEqual(msrmnt.getDate())) {
-                Temppositions[counter] = i;
+                tempPositions[counter] = i;
                 counter++;
             }
         }
         int[] positions = new int[counter];
         for (int i = 0; i < counter; i++) {
-            positions[i] = Temppositions[i];
+            positions[i] = tempPositions[i];
         }
         return positions;
     }

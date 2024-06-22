@@ -64,14 +64,14 @@ public class ContainerImpl implements Container {
     public void setItemType(ContainerType itemType) {
         this.containerType = itemType;
     }
-    /**Metodo responsável por especificar o tipo do container
+    /**Metodo responsável por especificar a capacidade
      *
-     * @param capacity tipo do container
+     * @param capacity a capacidade do container
      */
     public void setCapacity(double capacity) {
         this.capacity = capacity;
     }
-    /**Metodo responsável por especificar o tipo do container
+    /**Metodo responsável por especificar o array de measurements
      *
      * @param measurements array de medições
      */
@@ -147,7 +147,7 @@ public class ContainerImpl implements Container {
             throw new MeasurementException("Value is lesser than 0");
         } else if (msrmnt.getDate().isBefore(this.measurements.getMeasurements()[nMeasurements].getDate())) {
             throw new MeasurementException("The date is before the existing last measurement date");
-        } else if (this.measurements.compareMeasurements(this.measurements.Searchbydate(msrmnt), msrmnt)) {
+        } else if (this.measurements.compareMeasurements(this.measurements.searchbydate(msrmnt), msrmnt)) {
             throw new MeasurementException("For the given date the measurement already exists but the values are different");
         }
 

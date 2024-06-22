@@ -73,6 +73,14 @@ public class AidBoxImpl implements AidBox {
     }
 
     /**
+     * Método responsável por especificar o array de containers
+     * @param containers a coleção de containers
+     */
+    public void setContainerManagement(Container[] containers) {
+        this.containerManagement.setContainers(containers);
+    }
+
+    /**
      * Metodo responsável por retornar o código da AidBox
      *
      * @return código da AidBox
@@ -282,8 +290,10 @@ public class AidBoxImpl implements AidBox {
         Container[] newContainer = new Container[container.length];
         try {
             for (int i = 0; i < newContainer.length; i++) {
-                ContainerImpl container1 = (ContainerImpl) container[i];
-                newContainer[i] = (Container) container1.clone();
+                if (container[i] != null) {
+                    ContainerImpl container1 = (ContainerImpl) container[i];
+                    newContainer[i] = (Container) container1.clone();
+                }
             }
         } catch (CloneNotSupportedException ex) {
             System.out.println(ex.getMessage());
@@ -307,7 +317,14 @@ public class AidBoxImpl implements AidBox {
         return true;
     }
 
-
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        AidBoxImpl clone = (AidBoxImpl) super.clone();
+        clone.setCode(this.getCode());
+        clone.setZone(this.getZone());
+        clone.setContainerManagement(this.getContainers());
+        return clone;
+    }
 
     @Override
     public String toString() {
