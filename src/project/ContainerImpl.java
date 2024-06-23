@@ -196,6 +196,7 @@ public class ContainerImpl implements Container {
 
             } catch (CloneNotSupportedException ex) {
                 System.out.println(ex.getMessage());
+                return null;
         }
         return newMeasurements;
     }

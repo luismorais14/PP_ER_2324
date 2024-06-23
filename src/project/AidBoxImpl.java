@@ -30,8 +30,8 @@ public class AidBoxImpl implements AidBox {
 
     private String code;
     private String zone;
-    private HTTPProvider httpprovider;
-    private ContainerManagement containerManagement;
+    private HTTPProvider httpprovider = new HTTPProvider();
+    private ContainerManagement containerManagement = new ContainerManagement();
 
     /**
      * Construtor de AidBox
@@ -39,8 +39,6 @@ public class AidBoxImpl implements AidBox {
     public AidBoxImpl() {
         this.code = null;
         this.zone = null;
-        this.httpprovider = new HTTPProvider();
-        this.containerManagement = new ContainerManagement();
     }
 
     /**
@@ -52,8 +50,6 @@ public class AidBoxImpl implements AidBox {
     public AidBoxImpl(String code, String zone) {
         this.code = code;
         this.zone = zone;
-        this.httpprovider = new HTTPProvider();
-        this.containerManagement = new ContainerManagement();
     }
 
     /**
@@ -139,6 +135,7 @@ public class AidBoxImpl implements AidBox {
             }
         } catch (ParseException ex) {
             System.out.println(ex.getMessage());
+            return 0.0;
         }
         return distance;
     }
@@ -182,6 +179,7 @@ public class AidBoxImpl implements AidBox {
             }
         } catch (ParseException ex) {
             System.out.println(ex.getMessage());
+            return 0.0;
         }
         return duration;
     }
@@ -325,7 +323,6 @@ public class AidBoxImpl implements AidBox {
 
     @Override
     public String toString() {
-
         return "Code: " + this.code
                 + "\nZone: " + this.zone
                 + "\nContentores: " + showContainers(this.containerManagement.getContainers());

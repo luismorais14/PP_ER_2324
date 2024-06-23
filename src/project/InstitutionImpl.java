@@ -26,6 +26,7 @@ import com.estg.pickingManagement.Vehicle;
 import java.time.LocalDateTime;
 
 import management.PickingMapManagement;
+import management.VehicleImpl;
 import management.VehicleManagement;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -182,6 +183,13 @@ public class InstitutionImpl implements Institution {
         return this.deepCopyAidBoxes(this.aidboxes.getAidBoxes());
     }
 
+    /**
+     * Método responsável por retornar uma cópia de um container existente da aibox e do tipo recebidos como parâmetros
+     * @param aidbox a aidbox onde está o container
+     * @param ct o tipo do container
+     * @return uma cópia de um container existente da aibox e do tipo recebidos como parâmetros
+     * @throws ContainerException exceção a ser lançada caso a aidbox não exista ou se não existir nenhum container daquele tipo
+     */
     @Override
     public Container getContainer(AidBox aidbox, ContainerType ct) throws ContainerException {
         try {
@@ -193,14 +201,19 @@ public class InstitutionImpl implements Institution {
             }
         } catch (AidBoxException ex) {
             System.out.println(ex.getMessage());
+            return null;
         }
 
         return this.deepCopyContainer(aidbox.getContainer(ct));
     }
 
+    /**
+     * Método responsável por retornar uma deep copy dos veículos na instituição
+     * @return uma deep copy dos veículos da instituição
+     */
     @Override
     public Vehicle[] getVehicles() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        return this.deepCopyVehicles();
     }
 
     /**
@@ -336,6 +349,7 @@ public class InstitutionImpl implements Institution {
             }
         } catch (ParseException ex) {
             System.out.println(ex.getMessage());
+            return 0.0;
         }
         return distance;
     }
@@ -382,6 +396,7 @@ public class InstitutionImpl implements Institution {
             }
         } catch (CloneNotSupportedException ex) {
             System.out.println(ex.getMessage());
+            return null;
         }
 
         return newAidBox;
@@ -403,6 +418,7 @@ public class InstitutionImpl implements Institution {
             newContainer = (ContainerImpl) container1.clone();
         } catch (CloneNotSupportedException ex) {
             System.out.println(ex.getMessage());
+            return null;
         }
 
         return newContainer;
@@ -424,5 +440,21 @@ public class InstitutionImpl implements Institution {
             }
         }
         return this.pickingMaps.getPickingMaps()[index];
+    }
+
+    /**
+     * Método responsável por criar uma deep copy dos veículos da instituição
+     * @return uma deep copy dos veículos da instituição
+     * @return uma deep copy dos veículos da instituição
+     */
+    private Vehicle[] deepCopyVehicles() {
+        Vehicle[] newVehicle = new Vehicle[this.vehiclesManagement.getVehicles().length];
+        for (int i = 0; i < this.vehiclesManagement.getVehicles().length; i++) {
+            if (this.vehiclesManagement.getVehicles()[i] != null) {
+                VehicleImpl vehicle1 = (VehicleImpl) this.vehiclesManagement.getVehicles()[i];
+                newVehicle[i] = (Vehicle) vehicle1.deepCopyVehicle();
+            }
+        }
+        return newVehicle;
     }
 }
