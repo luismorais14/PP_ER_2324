@@ -12,6 +12,8 @@ package management;
 import com.estg.core.ContainerType;
 import com.estg.pickingManagement.Vehicle;
 
+import java.util.Objects;
+
 
 public class VehicleImpl implements Vehicle {
 
@@ -67,4 +69,15 @@ public class VehicleImpl implements Vehicle {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o){
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        VehicleImpl vehicle = (VehicleImpl) o;
+        return this.code.compareTo(vehicle.getCode()) == 0;
+    }
 }

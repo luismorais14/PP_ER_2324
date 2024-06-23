@@ -12,6 +12,7 @@ package management;
 import com.estg.pickingManagement.PickingMap;
 import com.estg.pickingManagement.Route;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 
 public class PickingMapImpl implements PickingMap {
@@ -96,6 +97,19 @@ public class PickingMapImpl implements PickingMap {
             }
         }
         return result;
+    }
+
+    //fazer a classe route para cosneguir fazer o .equals do route
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        PickingMapImpl that = (PickingMapImpl) o;
+        return Objects.equals(date, that.date) && Objects.deepEquals(route, that.route);
     }
 
     @Override

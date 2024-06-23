@@ -16,6 +16,11 @@ import java.util.Objects;
 
 public class ContainerTypeImpl implements ContainerType {
     private String[] types;
+    private String type = "WATER";
+
+    public String getType() {
+        return this.type;
+    }
 
 
     //verificar o .deepEquals

@@ -24,6 +24,9 @@ import com.estg.pickingManagement.PickingMap;
 import com.estg.pickingManagement.Vehicle;
 
 import java.time.LocalDateTime;
+
+import management.PickingMapManagement;
+import management.VehicleManagement;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -34,59 +37,42 @@ public class InstitutionImpl implements Institution {
     private final int ARRAY_SIZE = 10;
 
     private String InstitutionName;
-    private PickingMap[] pickingMaps;
+    private PickingMapManagement pickingMaps = new PickingMapManagement();
     private AidBoxManagement aidboxes = new AidBoxManagement();
-    private static int nAidBox;
     private MeasurementsManagement measurements = new MeasurementsManagement();
-    private static int nMeasurement;
-    private Vehicle[] enableVehicles;
+    private VehicleManagement vehiclesManagement = new VehicleManagement();
     private Vehicle[] disableVehicles;
-    private static int nPickingMaps;
     private HTTPProvider httpProvider;
-    private static int nDisableVehicles;
-    private static int nEnableVehicles;
+    private static int nDisableVehicles = 0;
 
     /**
      * Construtor de Institution
-     *
      */
     public InstitutionImpl() {
         this.InstitutionName = null;
-        this.pickingMaps = new PickingMap[ARRAY_SIZE];
-        this.enableVehicles = new Vehicle[ARRAY_SIZE];
         this.disableVehicles = new Vehicle[ARRAY_SIZE];
-        this.enableVehicles = new Vehicle[ARRAY_SIZE];
         this.httpProvider = new HTTPProvider();
-        nAidBox = 0;
-        nMeasurement = 0;
-        nPickingMaps = 0;
         nDisableVehicles = 0;
-        nEnableVehicles = 0;
     }
 
     /**
      * Construtor de Institution
      *
-     * @param name o nome da instituição
-     * @param pm os mapas de picking associados à instituição
-     * @param aidbox as caixas de ajuda associadas à instituição
+     * @param name        o nome da instituição
+     * @param pm          os mapas de picking associados à instituição
+     * @param aidbox      as caixas de ajuda associadas à instituição
      * @param measurement as medições associadas à instituição
-     * @param vehicle os veículos associados à instituição
+     * @param vehicles     os veículos associados à instituição
      */
-    public InstitutionImpl(String name, PickingMap[] pm, AidBox[] aidbox, Measurement[] measurement, Vehicle[] vehicle) {
+    public InstitutionImpl(String name, PickingMap[] pm, AidBox[] aidbox, Measurement[] measurement, Vehicle[] vehicles) {
         this.InstitutionName = name;
-        this.pickingMaps = pm;
+        this.pickingMaps.setPickingMaps(pm);
         this.aidboxes.setAidBox(aidbox);
         this.measurements.setMeasurements(measurement);
-        this.enableVehicles = vehicle;
+        this.vehiclesManagement.setVehicles(vehicles);
         this.httpProvider = new HTTPProvider();
         this.disableVehicles = new Vehicle[ARRAY_SIZE];
-        this.enableVehicles = new Vehicle[ARRAY_SIZE];
-        nAidBox = 0;
-        nMeasurement = 0;
-        nPickingMaps = 0;
         nDisableVehicles = 0;
-        nEnableVehicles = 0;
     }
 
     /**
@@ -102,10 +88,10 @@ public class InstitutionImpl implements Institution {
      * Define os picking maps da instituição.
      *
      * @param pickingMaps os novos mapas de picking a serem atribuídos à
-     * instituição
+     *                    instituição
      */
     public void setPickingMaps(PickingMap[] pickingMaps) {
-        this.pickingMaps = pickingMaps;
+        this.pickingMaps.setPickingMaps(pickingMaps);
     }
 
     /**
@@ -130,10 +116,10 @@ public class InstitutionImpl implements Institution {
      * Define os veículos habilitados associados à instituição.
      *
      * @param vehicle os novos veículos habilitados a serem atribuídos à
-     * instituição
+     *                instituição
      */
     public void setVehicle(Vehicle[] vehicle) {
-        this.enableVehicles = vehicle;
+        this.vehiclesManagement.setVehicles(vehicle);
     }
 
     /**
@@ -152,7 +138,7 @@ public class InstitutionImpl implements Institution {
      * @param aidbox a aidbox a ser adicionada à instituição
      * @return true se a aidbox foi adicionada com sucesso, false caso contrário
      * @throws AidBoxException se a caixa de ajuda for nula ou contiver
-     * containers duplicados de um determinado tipo
+     *                         containers duplicados de um determinado tipo
      */
     @Override
     public boolean addAidBox(AidBox aidbox) throws AidBoxException {
@@ -168,10 +154,10 @@ public class InstitutionImpl implements Institution {
      * Adiciona uma medição a um contêiner.
      *
      * @param msrmnt a medição a ser adicionada
-     * @param cntnr o contêiner ao qual a medição será adicionada
+     * @param cntnr  o contêiner ao qual a medição será adicionada
      * @return true se a medição foi adicionada com sucesso, false caso
      * contrário
-     * @throws ContainerException se o contêiner for nulo
+     * @throws ContainerException   se o contêiner for nulo
      * @throws MeasurementException se o valor da medição for inválido
      */
     @Override
@@ -193,12 +179,23 @@ public class InstitutionImpl implements Institution {
      */
     @Override
     public AidBox[] getAidBoxes() {
-        return deepCopyAidBoxes(this.aidboxes.getAidBoxes()); // Verifica se esta correto
+        return this.deepCopyAidBoxes(this.aidboxes.getAidBoxes());
     }
 
     @Override
     public Container getContainer(AidBox aidbox, ContainerType ct) throws ContainerException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        try {
+            if (this.aidboxes.verifyAidBoxExistence(aidbox)) {
+                throw new ContainerException("AidBox is already exist");
+            }
+            if (aidbox.getContainer(ct) == null) {
+                throw new ContainerException("A container with the given item type doesn't exist");
+            }
+        } catch (AidBoxException ex) {
+            System.out.println(ex.getMessage());
+        }
+
+        return this.deepCopyContainer(aidbox.getContainer(ct));
     }
 
     @Override
@@ -220,25 +217,7 @@ public class InstitutionImpl implements Institution {
         if (vhcl == null) {
             throw new VehicleException("Vehicle is null.");
         }
-
-        if (enableVehicles == null) {
-            enableVehicles = new Vehicle[10];
-            nEnableVehicles = 0;
-        }
-
-        if (nEnableVehicles >= enableVehicles.length) {
-            expandVehicleArray();
-        }
-
-        for (Vehicle veh : enableVehicles) {
-            if (veh != null && veh.equals(vhcl)) {
-                aux = false;
-            }
-        }
-
-        enableVehicles[nEnableVehicles] = vhcl;
-        nEnableVehicles++;
-        return aux;
+        return this.vehiclesManagement.addVehicle(vhcl);
     }
 
     @Override
@@ -258,25 +237,25 @@ public class InstitutionImpl implements Institution {
      */
     @Override
     public PickingMap[] getPickingMaps() {
-        return this.pickingMaps;
+        return this.pickingMaps.getPickingMaps();
     }
 
     /**
      * Obtém os mapas de picking associados à instituição dentro de um intervalo
      * de datas especificado.
      *
-     * @param ldt a data de início do intervalo de datas
+     * @param ldt  a data de início do intervalo de datas
      * @param ldt1 a data de término do intervalo de datas
      * @return os mapas de picking associados à instituição dentro do intervalo
      * de datas especificado
      */
     @Override
     public PickingMap[] getPickingMaps(LocalDateTime ldt, LocalDateTime ldt1) {
-        PickingMap[] tmpPickingMap = new PickingMap[this.pickingMaps.length];
+        PickingMap[] tmpPickingMap = new PickingMap[this.pickingMaps.getPickingMaps().length];
         int tmpNPickingMaps = 0;
-        for (int i = 0; i < pickingMaps.length; i++) {
-            if (this.pickingMaps[i].getDate().isBefore(ldt1) && this.pickingMaps[i].getDate().isAfter(ldt)) {
-                tmpPickingMap[tmpNPickingMaps] = pickingMaps[i];
+        for (int i = 0; i < this.pickingMaps.getPickingMaps().length; i++) {
+            if (this.pickingMaps.getPickingMaps()[i].getDate().isBefore(ldt1) && this.pickingMaps.getPickingMaps()[i].getDate().isAfter(ldt)) {
+                tmpPickingMap[tmpNPickingMaps] = this.pickingMaps.getPickingMaps()[i];
                 tmpNPickingMaps++;
             }
         }
@@ -292,11 +271,11 @@ public class InstitutionImpl implements Institution {
     @Override
     public PickingMap getCurrentPickingMap() throws PickingMapException {
         PickingMap pm = null;
-        if (this.pickingMaps.length == 0) {
+        if (this.pickingMaps.getPickingMaps().length == 0) {
             throw new PickingMapException("There are no picking maps in the institution.");
         }
-        for (int i = 0; i < pickingMaps.length; i++) {
-            pm = compareDate(this.pickingMaps[i].getDate());
+        for (int i = 0; i < pickingMaps.getPickingMaps().length; i++) {
+            pm = compareDate(this.pickingMaps.getPickingMaps()[i].getDate());
         }
         return pm;
     }
@@ -314,13 +293,7 @@ public class InstitutionImpl implements Institution {
         if (pm == null) {
             throw new PickingMapException("The picking map is null.");
         }
-        boolean aux = false;
-        if (!verifyPickingMapExistence(pm)) {
-            this.pickingMaps[nPickingMaps] = pm;
-            aux = true;
-            nPickingMaps++;
-        }
-        return aux;
+        return this.pickingMaps.addPickingMap(pm);
     }
 
     /**
@@ -346,13 +319,13 @@ public class InstitutionImpl implements Institution {
             ja = (JSONArray) parser.parse(jsonString);
             for (Object obj : ja) {
                 JSONObject jsonObject = (JSONObject) obj;
-                String originalAidBox = (String) jsonObject.get("from");
-                if (originalAidBox.compareTo(this.InstitutionName) == 0) { // Troquei o getCode por this.Instituition name para calcular a distancia da instituicao á aidbox
+                String aidboxCode = (String) jsonObject.get("from");
+                if (aidboxCode.compareTo(aidbox.getCode()) == 0) {
                     JSONArray aidboxes = (JSONArray) jsonObject.get("to");
                     for (Object aidboxesObj : aidboxes) {
                         JSONObject aidboxObject = (JSONObject) aidboxesObj;
-                        String aidboxCode = (String) aidboxObject.get("name");
-                        if (aidboxCode.compareTo(aidbox.getCode()) == 0) {
+                        String institutionName = (String) aidboxObject.get("name");
+                        if (institutionName.compareTo("Base") == 0) {
                             Object distanceObj = aidboxObject.get("distance");
                             if (distanceObj instanceof Number) {
                                 distance = ((Number) distanceObj).doubleValue();
@@ -371,8 +344,8 @@ public class InstitutionImpl implements Institution {
      * Método responsável por retornar a posição na coleção da aidbox com o
      * container recebido como parâmetro
      *
-     * @param cntnr
-     * @return
+     * @param cntnr container a ser verificado
+     * @return a posição da aidbox que contem o container
      */
     private int checkAidBoxFromContainer(Container cntnr) {
         int index = -1;
@@ -415,6 +388,27 @@ public class InstitutionImpl implements Institution {
     }
 
     /**
+     * Método que cria uma (deep) copy do container recebido como parâmetro
+     *
+     * @param container o container a fazer uma (deep) copy
+     * @return a (deep) copy do container
+     */
+    private Container deepCopyContainer(Container container) {
+        if (container == null) {
+            return null;
+        }
+        ContainerImpl newContainer = new ContainerImpl();
+        try {
+            ContainerImpl container1 = (ContainerImpl) container;
+            newContainer = (ContainerImpl) container1.clone();
+        } catch (CloneNotSupportedException ex) {
+            System.out.println(ex.getMessage());
+        }
+
+        return newContainer;
+    }
+
+    /**
      * Compara a data fornecida com as datas dos mapas de coleta e retorna o
      * mapa de coleta mais próximo da data fornecida.
      *
@@ -422,49 +416,13 @@ public class InstitutionImpl implements Institution {
      * @return o mapa de coleta mais próximo da data fornecida
      */
     private PickingMap compareDate(LocalDateTime dt) {
-        LocalDateTime aux = this.pickingMaps[0].getDate();
+        LocalDateTime aux = this.pickingMaps.getPickingMaps()[0].getDate();
         int index = 0;
-        for (int i = 0; i < pickingMaps.length; i++) {
-            if (this.pickingMaps[i].getDate().compareTo(dt) > 0) { // Retorna 0 se for igual/ Data anterior retorna número menor que 0/ Data maior retorna valor maior que 0
-                aux = this.pickingMaps[i].getDate();
+        for (int i = 0; i < pickingMaps.getPickingMaps().length; i++) {
+            if (this.pickingMaps.getPickingMaps()[i].getDate().isAfter(dt)) {
                 index = i;
             }
         }
-        return this.pickingMaps[index];
+        return this.pickingMaps.getPickingMaps()[index];
     }
-
-    /**
-     * Verifica a existência de uma rota de coleta em um mapa de coleta com base
-     * nas rotas de caixas de ajuda associadas.
-     *
-     * @param pm o mapa de coleta a ser verificado
-     * @return true se uma rota de coleta com base nas rotas de caixas de ajuda
-     * associadas já existir no mapa de coleta, caso contrário, false
-     */
-    private boolean verifyPickingMapExistence(PickingMap pm) {
-        boolean aux = false;
-        for (int i = 0; i < this.pickingMaps.length; i++) {
-            for (int j = 0; j < this.pickingMaps[i].getRoutes().length; j++) {
-                if (this.pickingMaps[i].getRoutes()[j].containsAidBox(pm.getRoutes()[i].getRoute()[j])) {
-                    aux = true;
-                }
-            }
-        }
-        return aux;
-    }
-
-        /**
-     * Expande a capacidade do array de veículos habilitados.
-     *
-     */
-    public void expandVehicleArray() {
-        Vehicle[] newArray = new Vehicle[ARRAY_SIZE + 5];
-        for (int i = 0; i < nEnableVehicles; i++) {
-            newArray[i] = enableVehicles[i];
-        }
-        this.enableVehicles = newArray;
-    }
-
-    
-    
 }

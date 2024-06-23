@@ -21,7 +21,7 @@ import java.util.Objects;
 public class ContainerImpl implements Container {
     private ContainerType containerType;
     private double capacity;
-    private MeasurementsManagement measurements;
+    private MeasurementsManagement measurements = new MeasurementsManagement();
     private static int nMeasurements = 0;
     private String code;
     private HTTPProvider httpprovider;
@@ -43,10 +43,10 @@ public class ContainerImpl implements Container {
      * @param measurements array de medições
      * @param code Coordenadas da Aidbox
      */
-    public ContainerImpl(ContainerType it, double capacity, MeasurementsManagement measurements, String code) {
+    public ContainerImpl(ContainerType it, double capacity, Measurement[] measurements, String code) {
         this.containerType = it;
         this.capacity = capacity;
-        this.measurements = measurements;
+        this.measurements.setMeasurements(measurements);
         this.code = code;
         this.httpprovider = new HTTPProvider();
     }

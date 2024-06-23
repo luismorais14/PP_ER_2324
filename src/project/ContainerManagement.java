@@ -37,7 +37,7 @@ public class ContainerManagement {
      * Método responsável por retornar o número de containers na coleção
      * @return o número de containers na coleção
      */
-    public static int getnContainers() {
+    public int getnContainers() {
         return nContainers;
     }
 
@@ -78,7 +78,7 @@ public class ContainerManagement {
      * @throws AidBoxException se o container recebido como parâmetro não existir
      */
     public void removeContainer(Container cntnr) throws AidBoxException {
-        int index = findContainer(cntnr);
+        int index = this.findContainer(cntnr);
         if (cntnr == null) {
             throw new AidBoxException("Container is null");
         }

@@ -217,7 +217,7 @@ public class AidBoxImpl implements AidBox {
         boolean aux = false;
         Container tmpContainer = null;
 
-        for (int i = 0; i < ContainerManagement.getnContainers(); i++) {
+        for (int i = 0; i < containerManagement.getnContainers(); i++) {
             if (this.containerManagement.getContainers()[i].getType().equals(it)) {
                 index = i;
                 aux = true;
@@ -311,10 +311,7 @@ public class AidBoxImpl implements AidBox {
             return false;
         }
         AidBoxImpl other = (AidBoxImpl) obj;
-        if (this.code.compareTo(other.getCode()) != 0){
-            return false;
-        }
-        return true;
+        return this.code.compareTo(other.getCode()) == 0;
     }
 
     @Override

@@ -136,5 +136,21 @@ public class AidBoxManagement {
         this.aidboxes = newArray;
     }
 
-
+    /**
+     * Método responsável por verificar se uma aidbox já existe na coleção
+     * @param aidbox aidbox a ser verificada
+     * @return o sucesso ou insucesso da operação
+     * @throws AidBoxException exceção a ser lançada caso a aidbox recebida como parâmetro seja null
+     */
+    public boolean verifyAidBoxExistence(AidBox aidbox) throws AidBoxException {
+        if (aidbox == null) {
+            throw new AidBoxException("AidBox is null");
+        }
+        for (int i = 0; i < nAidBoxes; i++) {
+            if (this.aidboxes[i].equals(aidbox)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
