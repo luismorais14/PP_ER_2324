@@ -22,6 +22,7 @@ public class RouteImpl implements Route {
 
     private AidBoxManagement aidBoxManagement = new AidBoxManagement();
     private Vehicle vehicle;
+    private AidBox[] route;
 
 
     /**
@@ -93,4 +94,29 @@ public class RouteImpl implements Route {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
+    
+    
+    
+    /**
+ * Verifica se duas `AidBox` são iguais.
+ *
+ * @param aidbox a `AidBox` a ser comparada com a `AidBox` na rota
+ * @return true se as `AidBox` forem iguais, caso contrário, false
+ */
+    private boolean toEqualsAidBox(AidBox aidbox) {
+        boolean aux = true;
+        if ((aidbox == null) || (getClass() != aidbox.getClass())) {
+            aux = false;
+        } else {
+            for (int i = 0; i < route.length; i++) {
+                if (this.route[i].getCode().compareTo(aidbox.getCode()) == 0) {
+                    aux = true;
+                }
+            }
+
+        }
+        return aux;
+
+    }
+    
 }
