@@ -23,6 +23,9 @@ import com.estg.io.HTTPProvider;
 import com.estg.pickingManagement.PickingMap;
 import com.estg.pickingManagement.Vehicle;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.time.LocalDateTime;
 
 import management.PickingMapManagement;
@@ -42,18 +45,13 @@ public class InstitutionImpl implements Institution {
     private AidBoxManagement aidboxes = new AidBoxManagement();
     private MeasurementsManagement measurements = new MeasurementsManagement();
     private VehicleManagement vehiclesManagement = new VehicleManagement();
-    private Vehicle[] disableVehicles;
-    private HTTPProvider httpProvider;
-    private static int nDisableVehicles = 0;
+    private HTTPProvider httpProvider = new HTTPProvider();
 
     /**
      * Construtor de Institution
      */
     public InstitutionImpl() {
         this.InstitutionName = null;
-        this.disableVehicles = new Vehicle[ARRAY_SIZE];
-        this.httpProvider = new HTTPProvider();
-        nDisableVehicles = 0;
     }
 
     /**
@@ -70,10 +68,7 @@ public class InstitutionImpl implements Institution {
         this.pickingMaps.setPickingMaps(pm);
         this.aidboxes.setAidBox(aidbox);
         this.measurements.setMeasurements(measurement);
-        this.vehiclesManagement.setVehicles(vehicles);
-        this.httpProvider = new HTTPProvider();
-        this.disableVehicles = new Vehicle[ARRAY_SIZE];
-        nDisableVehicles = 0;
+        this.vehiclesManagement.setEnabledVehiclesVehicles(vehicles);
     }
 
     /**
@@ -119,8 +114,17 @@ public class InstitutionImpl implements Institution {
      * @param vehicle os novos veículos habilitados a serem atribuídos à
      *                instituição
      */
-    public void setVehicle(Vehicle[] vehicle) {
-        this.vehiclesManagement.setVehicles(vehicle);
+    public void setEnabledVehicles(Vehicle[] vehicle) {
+        this.vehiclesManagement.setEnabledVehiclesVehicles(vehicle);
+    }
+
+    /**
+     * Define os veículos desabilitados associados à instituição.
+     *
+     * @param vehicle os novos veículos desabilitados a serem atribuídos à instituição
+     */
+    public void setDisabledVehicles(Vehicle[] vehicle) {
+        this.vehiclesManagement.setDisabledVehicles(vehicle);
     }
 
     /**
@@ -233,14 +237,24 @@ public class InstitutionImpl implements Institution {
         return this.vehiclesManagement.addVehicle(vhcl);
     }
 
+    /**
+     * Método responsável por desativar um veículo
+     * @param vhcl veículo a desativar
+     * @throws VehicleException exceção a ser lançada caso o veículo não exista ou já esteja desativado
+     */
     @Override
     public void disableVehicle(Vehicle vhcl) throws VehicleException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        this.vehiclesManagement.disableVehicle(vhcl);
     }
 
+    /**
+     * Método responsável por ativar um veículo
+     * @param vhcl veículo a ser ativado
+     * @throws VehicleException exceção a ser lançada caso o veículo não exista ou já esteja ativo
+     */
     @Override
     public void enableVehicle(Vehicle vhcl) throws VehicleException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        this.vehiclesManagement.enableVehicle(vhcl);
     }
 
     /**
@@ -323,13 +337,12 @@ public class InstitutionImpl implements Institution {
         if (aidbox == null) {
             throw new AidBoxException("AidBox is null");
         }
-
         JSONArray ja;
         JSONParser parser = new JSONParser();
-        String jsonString = this.httpProvider.getFromURL("https://data.mongodb-api.com/app/data-docuz/endpoint/distances");
         double distance = 0.0;
         try {
-            ja = (JSONArray) parser.parse(jsonString);
+            FileReader fileReader = new FileReader("JSONFiles\\Distances.json");
+            ja = (JSONArray) parser.parse(fileReader);
             for (Object obj : ja) {
                 JSONObject jsonObject = (JSONObject) obj;
                 String aidboxCode = (String) jsonObject.get("from");
@@ -348,6 +361,12 @@ public class InstitutionImpl implements Institution {
                 }
             }
         } catch (ParseException ex) {
+            System.out.println(ex.getMessage());
+            return 0.0;
+        } catch (FileNotFoundException ex) {
+            System.out.println(ex.getMessage());
+            return 0.0;
+        } catch (IOException ex) {
             System.out.println(ex.getMessage());
             return 0.0;
         }
@@ -444,7 +463,6 @@ public class InstitutionImpl implements Institution {
 
     /**
      * Método responsável por criar uma deep copy dos veículos da instituição
-     * @return uma deep copy dos veículos da instituição
      * @return uma deep copy dos veículos da instituição
      */
     private Vehicle[] deepCopyVehicles() {

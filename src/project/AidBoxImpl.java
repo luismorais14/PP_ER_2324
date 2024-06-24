@@ -17,6 +17,9 @@ import com.estg.core.exceptions.AidBoxException;
 import com.estg.core.exceptions.ContainerException;
 import com.estg.io.HTTPProvider;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Objects;
 
 import org.json.simple.JSONArray;
@@ -112,10 +115,10 @@ public class AidBoxImpl implements AidBox {
 
         JSONArray ja;
         JSONParser parser = new JSONParser();
-        String jsonString = this.httpprovider.getFromURL("https://data.mongodb-api.com/app/data-docuz/endpoint/distances");
         double distance = 0.0;
         try {
-            ja = (JSONArray) parser.parse(jsonString);
+            FileReader fileReader = new FileReader("JSONFiles\\Distances.json");
+            ja = (JSONArray) parser.parse(fileReader);
             for (Object obj : ja) {
                 JSONObject jsonObject = (JSONObject) obj;
                 String originalAidBox = (String) jsonObject.get("from");
@@ -134,6 +137,12 @@ public class AidBoxImpl implements AidBox {
                 }
             }
         } catch (ParseException ex) {
+            System.out.println(ex.getMessage());
+            return 0.0;
+        } catch (FileNotFoundException ex) {
+            System.out.println(ex.getMessage());
+            return 0.0;
+        } catch (IOException ex) {
             System.out.println(ex.getMessage());
             return 0.0;
         }
@@ -156,10 +165,10 @@ public class AidBoxImpl implements AidBox {
         JSONArray ja;
         JSONArray aidboxes;
         JSONParser parser = new JSONParser();
-        String jsonString = this.httpprovider.getFromURL("https://data.mongodb-api.com/app/data-docuz/endpoint/distances");
         double duration = 0.0;
         try {
-            ja = (JSONArray) parser.parse(jsonString);
+            FileReader fileReader = new FileReader("JSONFiles\\Distances.json");
+            ja = (JSONArray) parser.parse(fileReader);
             for (int i = 0; i < ja.size(); i++) {
                 JSONObject jsonObject = (JSONObject) ja.get(i);
                 String originalAidBox = (String) jsonObject.get("from");
@@ -178,6 +187,12 @@ public class AidBoxImpl implements AidBox {
                 }
             }
         } catch (ParseException ex) {
+            System.out.println(ex.getMessage());
+            return 0.0;
+        } catch (FileNotFoundException ex) {
+            System.out.println(ex.getMessage());
+            return 0.0;
+        } catch (IOException ex) {
             System.out.println(ex.getMessage());
             return 0.0;
         }

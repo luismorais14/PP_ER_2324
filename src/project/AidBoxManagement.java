@@ -12,6 +12,8 @@ package project;
 import com.estg.core.AidBox;
 import com.estg.core.Container;
 import com.estg.core.exceptions.AidBoxException;
+import com.estg.pickingManagement.Vehicle;
+import okhttp3.internal.connection.RouteException;
 
 public class AidBoxManagement {
     private final int ARRAY_SIZE = 10;
@@ -142,7 +144,7 @@ public class AidBoxManagement {
      * @return o sucesso ou insucesso da operação
      * @throws AidBoxException exceção a ser lançada caso a aidbox recebida como parâmetro seja null
      */
-    public boolean verifyAidBoxExistence(AidBox aidbox) throws AidBoxException {
+    public boolean verifyAidBoxExistence(AidBox aidbox) throws AidBoxException, RouteException {
         if (aidbox == null) {
             throw new AidBoxException("AidBox is null");
         }
@@ -152,5 +154,28 @@ public class AidBoxManagement {
             }
         }
         return false;
+    }
+
+    /**
+     * Verifica a compatibilidade de uma `AidBox` com o veículo da rota.
+     *
+     * @param aidbox a `AidBox` cuja compatibilidade deve ser verificada
+     * @return true se a `AidBox` for compatível com o veículo da rota, caso contrário, false
+     */
+    public boolean verifyCompatibility(AidBox aidbox, Vehicle vhcl) {
+        boolean aux = false;
+        int tmpCounter = 0;
+        for (int i = 0; i < this.aidboxes.length; i++) {
+            for (int j = 0; j < this.aidboxes[i].getContainers().length; j++) {
+                if (vhcl.getCapacity(this.aidboxes[i].getContainers()[j].getType()) != 0.0) {
+                    tmpCounter++;
+                }
+            }
+        }
+        if (tmpCounter != 0) {
+            aux = true;
+        }
+
+        return aux;
     }
 }

@@ -28,7 +28,7 @@ public class PP_ER_2324 {
 
     public static void main(String[] args) throws AidBoxException, ContainerException, IOException {
         AidBoxImpl aidbox1 = new AidBoxImpl("CAIXF51", "Lousada");
-        AidBoxImpl aidbox2 = new AidBoxImpl("CAIXF33", "Felgueiras");
+        AidBoxImpl aidbox2 = new AidBoxImpl("CAIXF40", "Felgueiras");
         PickingMapImpl pm = new PickingMapImpl();
         PickingMap[] pma = {pm};
         AidBoxImpl[] originalAidBoxes = {aidbox1, aidbox2};
@@ -48,26 +48,15 @@ public class PP_ER_2324 {
         dh.apiToReadings();
         dh.apiToVehicles();
 
-        System.out.println("Teste método getAidBoxes:");
-        for (int i = 0; i < institution.getAidBoxes().length; i++) {
-            System.out.println(institution.getAidBoxes()[i]);
-        }
+        double distance = 0.0;
+        double duration = 0.0;
 
-        System.out.println("\nTeste deep Copy:");
+        distance = institution.getDistance(aidbox2);
 
-        // Create a container and an AidBox
-        ContainerImpl originalContainer = new ContainerImpl(type1, 500 , ma, "N1EI");
-        aidbox2.addContainer(originalContainer);
+        System.out.println("Distance test");
+        System.out.println(distance);
+        System.out.println(duration);
 
-        // Retrieve a deep copy of the container from the AidBox
-        ContainerImpl copiedContainer = (ContainerImpl) institution.getContainer(aidbox2, type1);
-
-        // Modify the original container
-        originalContainer.setCapacity(20);
-
-        // Check if the copied container is unaffected
-        System.out.println("Original Container Quantity: " + originalContainer.getCapacity());
-        System.out.println("Copied Container Quantity: " + copiedContainer.getCapacity());
     }
 
 }

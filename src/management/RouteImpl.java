@@ -10,17 +10,42 @@
 package management;
 
 import com.estg.core.AidBox;
+import com.estg.core.exceptions.AidBoxException;
 import com.estg.pickingManagement.Report;
 import com.estg.pickingManagement.Route;
 import com.estg.pickingManagement.Vehicle;
 import com.estg.pickingManagement.exceptions.RouteException;
+import project.AidBoxManagement;
 
 
 public class RouteImpl implements Route {
 
+    private AidBoxManagement aidBoxManagement = new AidBoxManagement();
+    private Vehicle vehicle;
+
+
+    /**
+     * Método responsável por adicionar uma aidbox à rota
+     * @param aidbox aidbox a ser adicionada
+     * @throws RouteException exceção a ser lançada caso a aidbox seja null, caso a aidbox já esteja na rota ou caso a aidbox não seja compatível
+     */
     @Override
     public void addAidBox(AidBox aidbox) throws RouteException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        if (aidbox == null) {
+            throw new RouteException("AidBox is null");
+        }
+        try {
+            if (this.aidBoxManagement.verifyAidBoxExistence(aidbox)) {
+                throw new RouteException("AidBox already exists");
+            }
+        } catch (AidBoxException ex) {
+            System.out.println(ex.getMessage());
+            return;
+        }
+        if (!this.aidBoxManagement.verifyCompatibility(aidbox, this.vehicle)) {
+            throw new RouteException("AidBox is not compatible");
+        }
+        this.aidBoxManagement.addAidBox(aidbox);
     }
 
     @Override
