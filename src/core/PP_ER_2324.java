@@ -32,7 +32,7 @@ public class PP_ER_2324 {
         AidBoxImpl[] originalAidBoxes = {aidbox1, aidbox2};
         MeasurementImpl mi = new MeasurementImpl(LocalDateTime.now(), 232.2);
         Measurement[] ma = {mi};
-        VehicleImpl vehicle = new VehicleImpl();
+        VehicleImpl vehicle = new VehicleImpl("JKL567");
         Vehicle[] va = {vehicle};
         InstitutionImpl institution = new InstitutionImpl("Cerci", pma, originalAidBoxes, ma, va);
         ContainerTypeImpl type = new ContainerTypeImpl();
@@ -50,9 +50,7 @@ public class PP_ER_2324 {
 
 
 
-        System.out.println("ContnainerType Test");
-        System.out.println("\n" + type);
-
+        System.out.println("ContnainerType on vehicle Test");
 
 
 

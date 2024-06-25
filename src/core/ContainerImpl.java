@@ -17,7 +17,7 @@ import com.estg.core.exceptions.MeasurementException;
 import java.time.LocalDate;
 
 public class ContainerImpl implements Container {
-    private static ContainerType containerType;
+    private ContainerType containerType;
     private double capacity;
     private MeasurementsManagement measurements = new MeasurementsManagement();
     private static int nMeasurements = 0;

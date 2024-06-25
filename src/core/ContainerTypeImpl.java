@@ -53,6 +53,14 @@ public class ContainerTypeImpl implements ContainerType {
         }
     }
 
+    /**
+     * Método responsável por retornar a coleção de tipos de containers
+     * @return a coleção de tipos
+     */
+    public String[] getTypes() {
+        return this.types;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

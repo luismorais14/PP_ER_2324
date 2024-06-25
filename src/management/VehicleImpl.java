@@ -11,8 +11,12 @@ package management;
 
 import com.estg.core.ContainerType;
 import com.estg.pickingManagement.Vehicle;
+
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+
+import core.ContainerTypeImpl;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -20,36 +24,22 @@ import org.json.simple.parser.ParseException;
 
 public class VehicleImpl implements Vehicle {
 
-    private double capacity;
     private String code;
-    private Vehicle[] vehicles; // meti aqui para o getCapacity
 
     /**
      * Construtor de VehicleImpl
      */
     public VehicleImpl() {
-        this.capacity = 0.0;
         this.code = "";
     }
 
     /**
      * Construtor de VehicleImpl
      *
-     * @param capacity a capacidade do veículo
      * @param code o código do veículo
      */
-    public VehicleImpl(double capacity, String code) {
-        this.capacity = capacity;
+    public VehicleImpl(String code) {
         this.code = code;
-    }
-
-    /**
-     * Método responsável por especificar a capacidade do veículo
-     *
-     * @param capacity a capacidade do veíuculo
-     */
-    public void setCapacity(double capacity) {
-        this.capacity = capacity;
     }
 
     /**
@@ -64,39 +54,86 @@ public class VehicleImpl implements Vehicle {
     /**
      * Método responsável por retornar o código do veículo
      *
-     * @return
+     * @return o código do veículo
      */
     @Override
     public String getCode() {
         return this.code;
     }
 
-    //talvez ir buscar à API a capacidade, idk 
     @Override
-    public double getCapacity(ContainerType ct) { // Vê se está certo
+    public double getCapacity(ContainerType ct) {
         if (ct == null) {
             return 0.0;
         }
 
-        JSONArray ja;
-        JSONParser parser = new JSONParser();
-        double distance = 0.0;
+        double clothingCapacity = 0.0;
+        double medicideCapacity = 0.0;
+        double perishableCapacity = 0.0;
+        double nonPerishableCapacity = 0.0;
 
-        try {
-            FileReader fileReader = new FileReader("JSONFiles\\Capacities.json");
-            ja = (JSONArray) parser.parse(fileReader);
-            for (Object vehicle : vehicles) {
-                JSONObject vehicleObj = (JSONObject) vehicle;
-                String containerType = (String) vehicleObj.get("containerType");
-                if (containerType.equals(ct.toString())) {
-                    capacity = (double) vehicleObj.get("capacity");
-                    break;
+        if (ct instanceof ContainerTypeImpl) {
+            ContainerTypeImpl containerType = (ContainerTypeImpl) ct;
+            String[] types = containerType.getTypes();
+
+
+            JSONArray ja;
+            JSONParser parser = new JSONParser();
+            try {
+                FileReader fileReader = new FileReader("JSONFiles\\Vehicles.json");
+                ja = (JSONArray) parser.parse(fileReader);
+                for (Object obj : ja) {
+                    JSONObject jsonObject = (JSONObject) obj;
+                    String vehicleCode = (String) jsonObject.get("code");
+                    if (vehicleCode.compareTo(this.code) == 0) {
+                        JSONObject capacites = (JSONObject) jsonObject.get("capacity");
+                        Object clothing = capacites.get("clothing");
+                        Object medicine = capacites.get("medicine");
+                        Object perishable = capacites.get("perishable food");
+                        Object nonPerishable = capacites.get("non perishable food");
+
+                        if (clothing instanceof Number) {
+                            clothingCapacity = ((Number) clothing).doubleValue();
+                        }
+                        if (medicine instanceof Number) {
+                            medicideCapacity = ((Number) medicine).doubleValue();
+                        }
+                        if (perishable instanceof Number) {
+                            perishableCapacity = ((Number) perishable).doubleValue();
+                        }
+                        if (nonPerishable instanceof Number) {
+                            nonPerishableCapacity = ((Number) nonPerishable).doubleValue();
+                        }
+
+                    }
+
+
+                        switch (containerType) {
+                            case "clothing":
+                                return clothingCapacity;
+                            case "medicine":
+                                return medicideCapacity;
+                            case "perishable food":
+                                return perishableCapacity;
+                            case "non perishable food":
+                                return nonPerishableCapacity;
+                            default:
+                                return 0.0;
+                        }
+
                 }
+            } catch (ParseException ex) {
+                System.out.println(ex.getMessage());
+                return 0.0;
+            } catch (FileNotFoundException ex) {
+                System.out.println(ex.getMessage());
+                return 0.0;
+            } catch (IOException ex) {
+                System.out.println(ex.getMessage());
+                return 0.0;
             }
-        } catch (IOException | ParseException e) {
-            System.out.println("Error reading JSON file: " + e.getMessage());
         }
-        return capacity;
+        return 0.0;
     }
 
     /**
@@ -108,7 +145,6 @@ public class VehicleImpl implements Vehicle {
         VehicleImpl clone = new VehicleImpl();
 
         clone.setCode(this.getCode());
-        clone.setCapacity(this.getCapacity(null)); //alterar posteriormente
         return clone;
     }
 
