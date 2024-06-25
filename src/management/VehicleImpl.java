@@ -22,7 +22,7 @@ public class VehicleImpl implements Vehicle {
 
     private double capacity;
     private String code;
-    private Vehicle[] vehicles;
+    private Vehicle[] vehicles; // meti aqui para o getCapacity
 
     /**
      * Construtor de VehicleImpl
