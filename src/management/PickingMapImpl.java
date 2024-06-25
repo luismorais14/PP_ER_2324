@@ -99,7 +99,6 @@ public class PickingMapImpl implements PickingMap {
         return result;
     }
 
-    //fazer a classe route para cosneguir fazer o .equals do route
     @Override
     public boolean equals(Object o) {
         if (this == o) {

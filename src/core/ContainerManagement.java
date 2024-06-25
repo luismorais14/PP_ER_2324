@@ -7,7 +7,7 @@
  * Número: 8230258
  * Turma: T3
  */
-package project;
+package core;
 
 import com.estg.core.Container;
 import com.estg.core.exceptions.AidBoxException;
@@ -160,4 +160,14 @@ public class ContainerManagement {
         return false;
     }
 
+    @Override
+    public String toString() {
+        String txt = "";
+        for (int i = 0; i < this.containers.length; i++) {
+            if (this.containers[i] != null) {
+                txt += this.containers[i].toString() + "\n";
+            }
+        }
+        return txt;
+    }
 }

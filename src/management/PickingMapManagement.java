@@ -129,4 +129,14 @@ public class PickingMapManagement {
         return false;
     }
 
+    @Override
+    public String toString() {
+        String txt = "";
+        for (int i = 0; i < this.pickingMaps.length; i++) {
+            if (this.pickingMaps[i] != null) {
+                txt += this.pickingMaps[i].toString() + "\n";
+            }
+        }
+        return txt;
+    }
 }

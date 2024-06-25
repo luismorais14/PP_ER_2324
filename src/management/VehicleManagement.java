@@ -330,4 +330,52 @@ public class VehicleManagement {
         this.disabledVehicles = newArray;
     }
 
+    /**
+     * Método responsável por mostrar em String o array de veículos
+     * @return a string do array de veículos
+     */
+    private String showAllVehicles() {
+        String txt = "";
+        for (int i = 0; i < this.vehicles.length; i++) {
+            if (this.vehicles[i] != null) {
+                txt += this.vehicles[i].toString() + "\n";
+            }
+        }
+        return txt;
+    }
+
+    /**
+     * Método responsável por mostrar em String o array de veículos ativos
+     * @return a string do array de veículos ativos
+     */
+    private String showEnabledVehicles() {
+        String txt = "";
+        for (int i = 0; i < this.enabledVehicles.length; i++) {
+            if (this.enabledVehicles[i] != null) {
+                txt += this.enabledVehicles[i].toString() + "\n";
+            }
+        }
+        return txt;
+    }
+
+    /**
+     * Método responsável por mostrar em String o array de veículos inativos
+     * @return a string do array de veículos inativos
+     */
+    private String showDisabledVehicles() {
+        String txt = "";
+        for (int i = 0; i < this.disabledVehicles.length; i++) {
+            if (this.disabledVehicles[i] != null) {
+                txt += this.disabledVehicles[i].toString() + "\n";
+            }
+        }
+        return txt;
+    }
+
+    @Override
+    public String toString() {
+        return "All Vehicles: " + this.showAllVehicles() +
+                "\nEnabled vehicles: " + this.showEnabledVehicles() +
+                "\nDisabled Vehicles: " + this.showDisabledVehicles();
+    }
 }

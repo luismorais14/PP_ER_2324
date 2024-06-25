@@ -23,15 +23,21 @@ public class ReportImpl implements Report {
     private int notUsedVehicles;
     private LocalDateTime reportDate;
 
-    /**Construtor de Route
-     *
+    /**
+     * Construtor de Route
      */
     public ReportImpl() {
-
+        this.usedVehicles = 0;
+        this.pickedContainers = 0;
+        this.totalDistance = 0.0;
+        this.totalDuration = 0.0;
+        this.nonPickedContainers = 0;
+        this.notUsedVehicles = 0;
+        this.reportDate = null;
     }
 
-    /**Construtor de Vehicle
-     *
+    /**
+     * Construtor de Vehicle
      * @param uVehicle o veículo associado a esta rota
      * @param tDistance a distância total da rota
      * @param tDuration a duração total da rota
@@ -169,4 +175,16 @@ public class ReportImpl implements Report {
         return this.reportDate;
     }
 
+    @Override
+    public String toString() {
+        return "ReportImpl{" +
+                "usedVehicles=" + this.usedVehicles +
+                ", pickedContainers=" + this.pickedContainers +
+                ", totalDistance=" + this.totalDistance +
+                ", totalDuration=" + this.totalDuration +
+                ", nonPickedContainers=" + this.nonPickedContainers +
+                ", notUsedVehicles=" + this.notUsedVehicles +
+                ", reportDate=" + this.reportDate +
+                '}';
+    }
 }

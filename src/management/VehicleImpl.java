@@ -10,11 +10,7 @@
 package management;
 
 import com.estg.core.ContainerType;
-import com.estg.core.exceptions.VehicleException;
 import com.estg.pickingManagement.Vehicle;
-import project.AidBoxImpl;
-
-import java.util.Objects;
 
 
 public class VehicleImpl implements Vehicle {
@@ -97,5 +93,11 @@ public class VehicleImpl implements Vehicle {
         }
         VehicleImpl vehicle = (VehicleImpl) o;
         return this.code.compareTo(vehicle.getCode()) == 0;
+    }
+
+    @Override
+    public String toString() {
+        return "Code: " + this.code +
+                "\nCapacity: " + this.capacity;
     }
 }

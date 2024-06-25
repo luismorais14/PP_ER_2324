@@ -7,13 +7,12 @@
  * Número: 8230258
  * Turma: T3
  */
-package project;
+package core;
 
 import com.estg.core.AidBox;
 import com.estg.core.Container;
 import com.estg.core.exceptions.AidBoxException;
 import com.estg.pickingManagement.Vehicle;
-import okhttp3.internal.connection.RouteException;
 
 public class AidBoxManagement {
     private final int ARRAY_SIZE = 10;
@@ -142,11 +141,10 @@ public class AidBoxManagement {
      * Método responsável por verificar se uma aidbox já existe na coleção
      * @param aidbox aidbox a ser verificada
      * @return o sucesso ou insucesso da operação
-     * @throws AidBoxException exceção a ser lançada caso a aidbox recebida como parâmetro seja null
      */
-    public boolean verifyAidBoxExistence(AidBox aidbox) throws AidBoxException, RouteException {
+    public boolean verifyAidBoxExistence(AidBox aidbox) {
         if (aidbox == null) {
-            throw new AidBoxException("AidBox is null");
+            return false;
         }
         for (int i = 0; i < nAidBoxes; i++) {
             if (this.aidboxes[i].equals(aidbox)) {
@@ -177,5 +175,32 @@ public class AidBoxManagement {
         }
 
         return aux;
+    }
+
+    /**
+     * Encontra o índice de uma `AidBox` na coleção
+     *
+     * @param aidbox a `AidBox` cujo índice deve ser encontrado
+     * @return o índice da `AidBox` ou -1 se a `AidBox` não estiver n coleção
+     */
+    public int indexFounder(AidBox aidbox) {
+        int index = -1;
+        for (int i = 0; i < this.aidboxes.length; i++) {
+            if (this.aidboxes[i].getCode().compareTo(aidbox.getCode()) == 0) {
+                index = i;
+            }
+        }
+        return index;
+    }
+
+    @Override
+    public String toString() {
+        String txt = "";
+        for (int i = 0; i < this.aidboxes.length; i++) {
+            if (this.aidboxes[i] != null) {
+                txt += this.aidboxes[i].toString() + "\n";
+            }
+        }
+        return txt;
     }
 }

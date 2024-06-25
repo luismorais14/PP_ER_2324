@@ -7,13 +7,10 @@
  * Número: 8230258
  * Turma: T3
  */
-package project;
+package core;
 
-import com.estg.core.Container;
 import com.estg.core.Measurement;
 import com.estg.core.exceptions.MeasurementException;
-
-import java.util.Arrays;
 
 public class MeasurementsManagement {
     private final int ARRAY_SIZE = 10;
@@ -183,30 +180,14 @@ public class MeasurementsManagement {
         return positions;
     }
 
-    /**
-     * Método responsável por mostrar em formato String a coleção de medições
-     *
-     * @param measurements a coleção de medições a mostrar
-     * @return O texto em formato String da coleção de medições
-     */
-    private String showMeasurements(Measurement[] measurements) {
-        if (measurements == null) {
-            return "null";
-        }
-        String result = "";
-        for (int i = 0; i < measurements.length; i++) {
-            if (measurements[i] != null) {
-                result += measurements[i].toString() + "\n";
-            }
-        }
-        return result;
-    }
-
     @Override
     public String toString() {
-        return "MeasurementsManagement{" +
-                "ARRAY_SIZE=" + ARRAY_SIZE +
-                ", measurements=" + this.showMeasurements(this.measurements) +
-                '}';
+        String txt = "";
+        for (int i = 0; i < this.measurements.length; i++) {
+            if (this.measurements[i] != null) {
+                txt += this.measurements[i].toString() + "\n";
+            }
+        }
+        return txt;
     }
 }
