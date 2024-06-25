@@ -11,12 +11,18 @@ package management;
 
 import com.estg.core.ContainerType;
 import com.estg.pickingManagement.Vehicle;
-
+import java.io.FileReader;
+import java.io.IOException;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 public class VehicleImpl implements Vehicle {
 
     private double capacity;
     private String code;
+    private Vehicle[] vehicles;
 
     /**
      * Construtor de VehicleImpl
@@ -30,7 +36,7 @@ public class VehicleImpl implements Vehicle {
      * Construtor de VehicleImpl
      *
      * @param capacity a capacidade do veículo
-     * @param code     o código do veículo
+     * @param code o código do veículo
      */
     public VehicleImpl(double capacity, String code) {
         this.capacity = capacity;
@@ -65,14 +71,37 @@ public class VehicleImpl implements Vehicle {
         return this.code;
     }
 
-    //talvez ir buscar à API a capacidade, idk
+    //talvez ir buscar à API a capacidade, idk 
     @Override
-    public double getCapacity(ContainerType ct) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public double getCapacity(ContainerType ct) { // Vê se está certo
+        if (ct == null) {
+            return 0.0;
+        }
+
+        JSONArray ja;
+        JSONParser parser = new JSONParser();
+        double distance = 0.0;
+
+        try {
+            FileReader fileReader = new FileReader("JSONFiles\\Capacities.json");
+            ja = (JSONArray) parser.parse(fileReader);
+            for (Object vehicle : vehicles) {
+                JSONObject vehicleObj = (JSONObject) vehicle;
+                String containerType = (String) vehicleObj.get("containerType");
+                if (containerType.equals(ct.toString())) {
+                    capacity = (double) vehicleObj.get("capacity");
+                    break;
+                }
+            }
+        } catch (IOException | ParseException e) {
+            System.out.println("Error reading JSON file: " + e.getMessage());
+        }
+        return capacity;
     }
 
     /**
      * Método responsável por criar um deep copy de Vehicle
+     *
      * @return uma deep copy de Vehicle
      */
     public Object deepCopyVehicle() {
@@ -97,7 +126,7 @@ public class VehicleImpl implements Vehicle {
 
     @Override
     public String toString() {
-        return "Code: " + this.code +
-                "\nCapacity: " + this.capacity;
+        return "Code: " + this.code
+                + "\nCapacity: " + this.capacity;
     }
 }
