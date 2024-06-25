@@ -32,7 +32,7 @@ public class PP_ER_2324 {
         AidBoxImpl[] originalAidBoxes = {aidbox1, aidbox2};
         MeasurementImpl mi = new MeasurementImpl(LocalDateTime.now(), 232.2);
         Measurement[] ma = {mi};
-        VehicleImpl vehicle = new VehicleImpl("JKL567");
+        VehicleImpl vehicle = new VehicleImpl();
         Vehicle[] va = {vehicle};
         InstitutionImpl institution = new InstitutionImpl("Cerci", pma, originalAidBoxes, ma, va);
         ContainerTypeImpl type = new ContainerTypeImpl();
@@ -45,6 +45,8 @@ public class PP_ER_2324 {
         dh.apiToTypes();
         dh.apiToReadings();
         dh.apiToVehicles();
+
+        vehicle.setCode("JKL567");
 
         type.setContainerTypes();
 
