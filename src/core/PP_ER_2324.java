@@ -46,14 +46,18 @@ public class PP_ER_2324 {
         dh.apiToReadings();
         dh.apiToVehicles();
 
-        vehicle.setCode("JKL567");
+        vehicle.setCode("ABC123");
+        vehicle.setCapacities();
 
         type.setContainerTypes();
 
+        System.out.println("Types test");
+        System.out.println(type.toString());
 
+        System.out.println("\nContnainerType on vehicle Test");
+        System.out.println(vehicle.getCapacity(type));
 
-        System.out.println("ContnainerType on vehicle Test");
-
+        System.out.println(vehicle.toString());
 
 
     }

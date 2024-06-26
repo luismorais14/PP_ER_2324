@@ -89,11 +89,11 @@ public class VehicleImpl implements Vehicle {
                 JSONObject jsonObject = (JSONObject) obj;
                 String vehicleCode = (String) jsonObject.get("code");
                 if (vehicleCode.compareTo(this.code) == 0) {
-                    JSONObject capacites = (JSONObject) jsonObject.get("capacity");
-                    Object clothing = capacites.get("clothing");
-                    Object medicine = capacites.get("medicine");
-                    Object perishable = capacites.get("perishable food");
-                    Object nonPerishable = capacites.get("non perishable food");
+                    JSONObject capacities = (JSONObject) jsonObject.get("capacity");
+                    Object clothing = capacities.get("clothing");
+                    Object medicine = capacities.get("medicine");
+                    Object perishable = capacities.get("perishable food");
+                    Object nonPerishable = capacities.get("non perishable food");
 
                     if (clothing instanceof Number) {
                         this.clothingCapacity = ((Number) clothing).doubleValue();
@@ -128,7 +128,17 @@ public class VehicleImpl implements Vehicle {
             return 0.0;
         }
 
-
+        if (ct.equals("medicine")) {
+            return this.medicineCapacity;
+        } else if (ct.equals("non perishable food")) {
+            return this.perishableCapacity;
+        } else if (ct.equals("perishable food")) {
+            return this.nonPerishableCapacity;
+        } else if (ct.equals("clothing")) {
+            return this.clothingCapacity;
+        } else {
+            return 0.0;
+        }
     }
 
     /**
@@ -158,6 +168,12 @@ public class VehicleImpl implements Vehicle {
     @Override
     public String toString() {
         return "Code: " + this.code
-                + "\nCapacity: " + this.capacity;
+                + "\nCapacity: {"
+                + "\nClothing: " + this.clothingCapacity +
+                "\nMedicine: " + this.medicineCapacity +
+                "\nNon perishable food: " + this.nonPerishableCapacity +
+                "\nperishable food: " + this.perishableCapacity
+                + "\n}";
+
     }
 }

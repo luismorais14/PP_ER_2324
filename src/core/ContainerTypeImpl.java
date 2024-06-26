@@ -22,9 +22,9 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public class ContainerTypeImpl implements ContainerType {
-    private final int ARRAY_SIZE = 30;
+    private static final int ARRAY_SIZE = 30;
 
-    private String[] types = new String[ARRAY_SIZE];
+    private static ContainerType[] types = new ContainerType[ARRAY_SIZE];
 
     /**
      * Método responsável por atualizar os tipos de containers
@@ -37,9 +37,9 @@ public class ContainerTypeImpl implements ContainerType {
             ja = (JSONArray) parser.parse(fileReader);
             JSONObject jsonObject = (JSONObject) ja.get(0);
             JSONArray typesArray = (JSONArray) jsonObject.get("types");
-            this.types = new String[Math.min(typesArray.size(), ARRAY_SIZE)];
+            types = new ContainerType[Math.min(typesArray.size(), ARRAY_SIZE)];
             for (int i = 0; i < typesArray.size() && i < ARRAY_SIZE; i++) {
-                this.types[i] = (String) typesArray.get(i);
+                types[i] = (ContainerType) typesArray.get(i);
             }
         } catch (ParseException ex) {
             System.out.println(ex.getMessage());
@@ -57,9 +57,10 @@ public class ContainerTypeImpl implements ContainerType {
      * Método responsável por retornar a coleção de tipos de containers
      * @return a coleção de tipos
      */
-    public String[] getTypes() {
-        return this.types;
+    public ContainerType[] getTypes() {
+        return types;
     }
+
 
     @Override
     public boolean equals(Object o) {
@@ -76,9 +77,9 @@ public class ContainerTypeImpl implements ContainerType {
     @Override
     public String toString() {
         String txt = "";
-        for (int i = 0; i < this.types.length; i++) {
-            if (this.types[i] != null && !this.types[i].isBlank()) {
-                txt += this.types[i] + "\n";
+        for (int i = 0; i < types.length; i++) {
+            if (types[i] != null) {
+                txt += types[i] + "\n";
             }
         }
         return txt;
