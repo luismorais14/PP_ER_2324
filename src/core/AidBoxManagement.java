@@ -93,6 +93,9 @@ public class AidBoxManagement {
      * @return true se houver containers duplicados do mesmo tipo na aidbox, false caso contrário
      */
     public boolean verifyDuplicateContainers(AidBox aidbox) {
+        if (aidbox == null) {
+            return false;
+        }
         Container[] containers = aidbox.getContainers();
         boolean aux = false;
 

@@ -108,17 +108,17 @@ public class VehicleImpl implements Vehicle {
                         this.nonPerishableCapacity = ((Number) nonPerishable).doubleValue();
                     }
 
+                } else {
+                    System.out.println("There is no such vehicle with that code.");
+                    return;
                 }
             }
         } catch (ParseException ex) {
             System.out.println(ex.getMessage());
-            return;
         } catch (FileNotFoundException ex) {
             System.out.println(ex.getMessage());
-            return;
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
-            return;
         }
     }
 

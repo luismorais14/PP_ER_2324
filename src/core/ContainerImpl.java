@@ -185,8 +185,10 @@ public class ContainerImpl implements Container {
         Measurement[] newMeasurements = new Measurement[measurements.length];
         try {
             for (int i = 0; i < newMeasurements.length; i++) {
-                MeasurementImpl measurement1 = (MeasurementImpl) measurements[i];
-                newMeasurements[i] = (Measurement) measurement1.clone();
+                if (measurements[i] != null) {
+                    MeasurementImpl measurement1 = (MeasurementImpl) measurements[i];
+                    newMeasurements[i] = (Measurement) measurement1.clone();
+                }
             }
 
             } catch (CloneNotSupportedException ex) {

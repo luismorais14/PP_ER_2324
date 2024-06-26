@@ -24,7 +24,28 @@ import java.util.Objects;
 public class ContainerTypeImpl implements ContainerType {
     private static final int ARRAY_SIZE = 30;
 
-    private static ContainerType[] types = new ContainerType[ARRAY_SIZE];
+    private static String[] types = new String[ARRAY_SIZE];
+    private String type;
+
+
+    private ContainerTypeImpl(String type) {
+        this.type = type;
+    }
+
+    public static ContainerTypeImpl fromString(String type) {
+        for (int i = 0; i < types.length; i++) {
+
+            if (types[i] != null && types[i].equals(type)) {
+                return new ContainerTypeImpl(type);
+            }
+        }
+        throw new IllegalArgumentException("Unknown container type: " + type);
+    }
+
+    public String getType() {
+        return type;
+    }
+
 
     /**
      * Método responsável por atualizar os tipos de containers
@@ -37,9 +58,9 @@ public class ContainerTypeImpl implements ContainerType {
             ja = (JSONArray) parser.parse(fileReader);
             JSONObject jsonObject = (JSONObject) ja.get(0);
             JSONArray typesArray = (JSONArray) jsonObject.get("types");
-            types = new ContainerType[Math.min(typesArray.size(), ARRAY_SIZE)];
+            types = new String[Math.min(typesArray.size(), ARRAY_SIZE)];
             for (int i = 0; i < typesArray.size() && i < ARRAY_SIZE; i++) {
-                types[i] = (ContainerType) typesArray.get(i);
+                types[i] = (String) typesArray.get(i);
             }
         } catch (ParseException ex) {
             System.out.println(ex.getMessage());
@@ -53,15 +74,6 @@ public class ContainerTypeImpl implements ContainerType {
         }
     }
 
-    /**
-     * Método responsável por retornar a coleção de tipos de containers
-     * @return a coleção de tipos
-     */
-    public ContainerType[] getTypes() {
-        return types;
-    }
-
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -71,7 +83,21 @@ public class ContainerTypeImpl implements ContainerType {
             return false;
         }
         ContainerTypeImpl other = (ContainerTypeImpl) o;
-        return Arrays.deepEquals(types, other.types);
+        int aux = 0;
+
+        if (types.length != other.types.length) {
+            return false;
+        }
+
+        for (int i = 0; i < types.length; i++) {
+            if (!Objects.equals(types[i], other.types[i])) {
+                aux++;
+            }
+        }
+        if (aux == types.length) {
+            return true;
+        }
+        return false;
     }
 
     @Override
