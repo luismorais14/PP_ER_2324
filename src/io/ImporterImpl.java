@@ -14,11 +14,12 @@ import com.estg.core.Container;
 import com.estg.core.ContainerType;
 import com.estg.core.Institution;
 import com.estg.core.exceptions.AidBoxException;
+import com.estg.core.exceptions.ContainerException;
 import com.estg.core.exceptions.InstitutionException;
 import com.estg.io.Importer;
 import core.AidBoxImpl;
 import core.ContainerImpl;
-import core.ContainerTypeImpl;
+import core.TypesManagement;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -31,22 +32,31 @@ import java.io.IOException;
 
 public class ImporterImpl implements Importer {
 
+
     @Override
     public void importData(Institution instn) throws FileNotFoundException, IOException, InstitutionException {
         if (instn == null) {
             throw new InstitutionException("Institution object is null");
         }
-        this.getAidBoxes(instn);
+        try {
+            this.readContainerTypes();
+            //todo ler vehicles
+            //todo ler containers
+            //todo ler measurements
+            this.getAidBoxes(instn);
+        } catch (ContainerException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    private void getAidBoxes(Institution instn)  {
+    private void getAidBoxes(Institution instn) throws ContainerException {
         JSONParser parser = new JSONParser();
         JSONArray aidboxesArray;
         JSONArray containerArray;
         String aidboxCode;
         String aidboxZone;
         String containerCode;
-        Container[] containers;
+        ContainerImpl[] containers;
 
         try {
             aidboxesArray = (JSONArray) parser.parse(new FileReader("JSONFiles\\AidBoxes.json"));
@@ -54,20 +64,18 @@ public class ImporterImpl implements Importer {
                 JSONObject obj = (JSONObject) aidboxesArray.get(i);
                 aidboxCode = obj.get("code").toString();
                 aidboxZone = obj.get("Zona").toString();
-                AidBoxImpl tmpAidBox = new AidBoxImpl(aidboxCode, aidboxZone);
+                AidBoxImpl AidBox = new AidBoxImpl(aidboxCode, aidboxZone);
 
                 containerArray = (JSONArray) obj.get("containers");
-                containers = new Container[containerArray.size()];
+                containers = new ContainerImpl[containerArray.size()];
                 for (int j = 0; j < containerArray.size(); j++) {
                     containerCode = containerArray.get(j).toString();
-                    ContainerImpl tmpContainer = new ContainerImpl();
-                    tmpContainer.setCode(containerCode);
-                    containers[j] = tmpContainer;
+                    //todo procurar container por instância já criada
+                    containers[j] = new ContainerImpl();
+                    containers[j].setCode(containerCode);
                 }
-                tmpAidBox.setContainerManagement(containers);
-                AidBox aidBox = (AidBox) tmpAidBox;
-                this.getContainers(aidBox);
-                if (instn.addAidBox(tmpAidBox)) {
+                AidBox.setContainerManagement(containers);
+                if (instn.addAidBox(AidBox)) {
                     System.out.println("AidBox added successfully");
                 } else {
                     System.out.println("AidBox not added successfully");
@@ -84,7 +92,7 @@ public class ImporterImpl implements Importer {
         }
     }
 
-    private void getContainers(AidBox aidBox)  {
+    private void getContainers(AidBox aidBox) throws ContainerException {
         JSONParser parser = new JSONParser();
         JSONArray containerArray;
         double containerCapacity;
@@ -97,22 +105,26 @@ public class ImporterImpl implements Importer {
                 for (int j = 0; j < containerArray.size(); j++) {
                     JSONObject obj = (JSONObject) containerArray.get(i);
                     if (aidBox.getContainers()[i].getCode().compareTo(obj.get("code").toString()) == 0) {
-                        containerCapacity = Double.parseDouble(obj.get("capacity").toString());
+                        containerCapacity = (Double) obj.get("capacity");
                         typeStr = obj.get("type").toString();
-                        containerType = ContainerTypeImpl.fromString(typeStr);
+                        containerType = TypesManagement.findByType(typeStr);
 
                         ContainerImpl tmpContainer = (ContainerImpl) aidBox.getContainers()[i];
                         tmpContainer.setCapacity(containerCapacity);
                         tmpContainer.setItemType(containerType);
+                        tmpContainer.setCode(aidBox.getContainers()[i].getCode());
+                        aidBox.addContainer(tmpContainer);
                     }
-
                 }
-
             }
-
         } catch (ParseException ex) {
             System.out.println(ex.getMessage());
         }
+    }
+
+    //Todo fazer
+    private void readContainerTypes() {
+        TypesManagement.setContainerTypes();
     }
 
 }

@@ -15,8 +15,11 @@ import com.estg.pickingManagement.Vehicle;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
 
 import core.ContainerTypeImpl;
+import core.TypesManagement;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -24,37 +27,25 @@ import org.json.simple.parser.ParseException;
 
 public class VehicleImpl implements Vehicle {
 
+    private final int ARRAY_SIZE = 10;
+
     private String code;
-    private double clothingCapacity;
-    private double medicineCapacity;
-    private double perishableCapacity;
-    private double nonPerishableCapacity;
+    private double[] capacities = new double[ARRAY_SIZE];
 
     /**
      * Construtor de VehicleImpl
      */
     public VehicleImpl() {
         this.code = "";
-        this.clothingCapacity = 0.0;
-        this.medicineCapacity = 0.0;
-        this.perishableCapacity = 0.0;
-        this.nonPerishableCapacity = 0.0;
     }
 
     /**
-     * Construtor de VehicleImpl
+     * Cosntrutor de VehicleImpl
+     *
      * @param code o código do veículo
-     * @param clothing o número de containers do tipo 'clothing' que o veículo pode transportar
-     * @param medicine o número de containers do tipo 'medicine' que o veículo pode transportar
-     * @param perishable o número de containers do tipo 'perishable food' que o veículo pode transportar
-     * @param nonPerishable o número de containers do tipo 'non perishable food que o veículo pode transportar
      */
-    public VehicleImpl(String code, double clothing, double medicine, double perishable, double nonPerishable) {
+    public VehicleImpl(String code) {
         this.code = code;
-        this.clothingCapacity = clothing;
-        this.medicineCapacity = medicine;
-        this.perishableCapacity = perishable;
-        this.nonPerishableCapacity = nonPerishable;
     }
 
     /**
@@ -90,24 +81,12 @@ public class VehicleImpl implements Vehicle {
                 String vehicleCode = (String) jsonObject.get("code");
                 if (vehicleCode.compareTo(this.code) == 0) {
                     JSONObject capacities = (JSONObject) jsonObject.get("capacity");
-                    Object clothing = capacities.get("clothing");
-                    Object medicine = capacities.get("medicine");
-                    Object perishable = capacities.get("perishable food");
-                    Object nonPerishable = capacities.get("non perishable food");
-
-                    if (clothing instanceof Number) {
-                        this.clothingCapacity = ((Number) clothing).doubleValue();
+                    for (int i = 0; i < ARRAY_SIZE; i++) {
+                        String type = TypesManagement.getTypes()[i];
+                        if (capacities.get(type) != null) {
+                            this.capacities[i] = (double) capacities.get(type);
+                        }
                     }
-                    if (medicine instanceof Number) {
-                        this.medicineCapacity = ((Number) medicine).doubleValue();
-                    }
-                    if (perishable instanceof Number) {
-                        this.perishableCapacity = ((Number) perishable).doubleValue();
-                    }
-                    if (nonPerishable instanceof Number) {
-                        this.nonPerishableCapacity = ((Number) nonPerishable).doubleValue();
-                    }
-
                 } else {
                     System.out.println("There is no such vehicle with that code.");
                     return;
@@ -122,23 +101,25 @@ public class VehicleImpl implements Vehicle {
         }
     }
 
+    /**
+     * Método responsável por retornar a capacidade do veíclo em função do tipo recebido como parâmetro
+     * @param ct o tipo de container
+     * @return a capacidade do veículo para o tipo recebido como parâmetro
+     */
     @Override
     public double getCapacity(ContainerType ct) {
-        if (ct == null || !(ct instanceof ContainerTypeImpl)) {
+        if (!(ct instanceof ContainerTypeImpl)) {
             return 0.0;
         }
 
-        if (ct.equals("medicine")) {
-            return this.medicineCapacity;
-        } else if (ct.equals("non perishable food")) {
-            return this.perishableCapacity;
-        } else if (ct.equals("perishable food")) {
-            return this.nonPerishableCapacity;
-        } else if (ct.equals("clothing")) {
-            return this.clothingCapacity;
-        } else {
-            return 0.0;
+        ContainerTypeImpl cti = (ContainerTypeImpl) ct;
+
+        for (int i = 0; i < TypesManagement.getContainerTypes().length; i++) {
+            if (cti.equals(TypesManagement.getContainerTypes()[i])) {
+                return this.capacities[i];
+            }
         }
+        return 0.0;
     }
 
     /**
@@ -151,6 +132,18 @@ public class VehicleImpl implements Vehicle {
 
         clone.setCode(this.getCode());
         return clone;
+    }
+
+    /**
+     * Método responsável por mostrar em String o array de capacidades
+     * @return a string do array de capacidades
+     */
+    private String showCapacities() {
+        String txt = "";
+        for (int i = 0; i < this.capacities.length; i++) {
+            txt += TypesManagement.getTypes()[i] + ": " + this.capacities[i] + "\n";
+        }
+        return txt;
     }
 
     @Override
@@ -169,10 +162,7 @@ public class VehicleImpl implements Vehicle {
     public String toString() {
         return "Code: " + this.code
                 + "\nCapacity: {"
-                + "\nClothing: " + this.clothingCapacity +
-                "\nMedicine: " + this.medicineCapacity +
-                "\nNon perishable food: " + this.nonPerishableCapacity +
-                "\nperishable food: " + this.perishableCapacity
+                + this.showCapacities()
                 + "\n}";
 
     }

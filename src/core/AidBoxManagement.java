@@ -97,20 +97,19 @@ public class AidBoxManagement {
             return false;
         }
         Container[] containers = aidbox.getContainers();
-        boolean aux = false;
 
         for (int i = 0; i < containers.length; i++) {
             if (containers[i] != null) {
                 for (int j = i; j < containers.length - i; j++) {
                     if (containers[j] != null) {
                         if (containers[i].getType().equals(containers[j].getType())) {
-                            aux = true;
+                            return true;
                         }
                     }
                 }
             }
         }
-        return aux;
+        return false;
     }
 
     /**

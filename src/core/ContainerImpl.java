@@ -132,7 +132,7 @@ public class ContainerImpl implements Container {
      * Método responsável por adicionar uma measurement à coleção
      * @param msrmnt a measurement a ser adicionada
      * @return o sucesso ou insucesso da operação
-     * @throws MeasurementException exceção a ser lançada se a medição for nula, se valor da medição for menor que 0, se a data da medição for anterior á mais antiga ou se já existir uma medição para essa data mas o valor for diferente
+     * @throws MeasurementException exceção a ser lançada se a medição for nula, se valor da medição for menor que 0, se a data da medição for anterior á mais recente ou se já existir uma medição para essa data mas o valor for diferente
      */
     @Override
     public boolean addMeasurement(Measurement msrmnt) throws MeasurementException {

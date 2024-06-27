@@ -38,8 +38,6 @@ public class PP_ER_2324 {
         VehicleImpl vehicle = new VehicleImpl();
         Vehicle[] va = {vehicle};
         //InstitutionImpl institution = new InstitutionImpl("Cerci", pma, originalAidBoxes, ma, va);
-        ContainerTypeImpl type = ContainerTypeImpl.fromString("medicine");
-        ContainerType type1 = (ContainerType) type;
         DataHandler dh = new DataHandler();
         Institution instn = new InstitutionImpl();
         ImporterImpl importer = new ImporterImpl();
@@ -52,7 +50,7 @@ public class PP_ER_2324 {
         dh.apiToVehicles();
 
         importer.importData(instn);
-        type.setContainerTypes();
+
 
         //vehicle.setCode("ABC123");
         //vehicle.setCapacities();

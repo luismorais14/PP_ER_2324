@@ -31,7 +31,7 @@ public class AidBoxImpl implements AidBox {
 
     private String code;
     private String zone;
-    private ContainerManagement containerManagement = new ContainerManagement();
+    private ContainerManagement containerManagement;
 
     /**
      * Construtor de AidBox
@@ -39,6 +39,7 @@ public class AidBoxImpl implements AidBox {
     public AidBoxImpl() {
         this.code = null;
         this.zone = null;
+        this.containerManagement = new ContainerManagement();
     }
 
     /**
@@ -50,6 +51,7 @@ public class AidBoxImpl implements AidBox {
     public AidBoxImpl(String code, String zone) {
         this.code = code;
         this.zone = zone;
+        this.containerManagement = new ContainerManagement();
     }
 
     /**
