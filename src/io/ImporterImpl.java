@@ -42,7 +42,7 @@ public class ImporterImpl implements Importer {
         }
         try {
             this.readContainerTypes();
-            this.readVehicles(instn);
+            this.readVehicles();
             //todo ler containers
             //todo ler measurements
             this.readAidBoxes(instn);
@@ -53,7 +53,7 @@ public class ImporterImpl implements Importer {
         }
     }
 
-    private void readVehicles(Institution instn) throws VehicleException {
+    private void readVehicles() throws VehicleException {
         JSONParser parser = new JSONParser();
         JSONArray ja;
         String vehicleCode;
@@ -124,7 +124,7 @@ public class ImporterImpl implements Importer {
         }
     }
 
-    private void getContainers(AidBox aidBox) throws ContainerException {
+    private void getContainers() throws ContainerException {
         JSONParser parser = new JSONParser();
         JSONArray containerArray;
         double containerCapacity;
@@ -133,7 +133,7 @@ public class ImporterImpl implements Importer {
 
         try {
             containerArray = (JSONArray) parser.parse("JSONFiles\\Containers.json");
-            for (int i = 0; i < aidBox.getContainers().length; i++) {
+            for (int i = 0; i < .length; i++) {
                 for (int j = 0; j < containerArray.size(); j++) {
                     JSONObject obj = (JSONObject) containerArray.get(i);
                     if (aidBox.getContainers()[i].getCode().compareTo(obj.get("code").toString()) == 0) {
