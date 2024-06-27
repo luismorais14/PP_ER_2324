@@ -115,6 +115,7 @@ public class VehicleManagement {
         }
         if (index == nVehicles) {
             this.vehicles[index] = null;
+            nVehicles--; // Faltava
         } else {
             for (int i = index; i < nVehicles - index - 1; i++) {
                 this.vehicles[i] = this.vehicles[i + 1];
