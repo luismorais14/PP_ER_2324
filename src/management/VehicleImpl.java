@@ -81,10 +81,10 @@ public class VehicleImpl implements Vehicle {
                 String vehicleCode = (String) jsonObject.get("code");
                 if (vehicleCode.compareTo(this.code) == 0) {
                     JSONObject capacities = (JSONObject) jsonObject.get("capacity");
-                    for (int i = 0; i < ARRAY_SIZE; i++) {
+                    for (int i = 0; i < capacities.size(); i++) {
                         String type = TypesManagement.getTypes()[i];
                         if (capacities.get(type) != null) {
-                            this.capacities[i] = (double) capacities.get(type);
+                            this.capacities[i] = ((Number) capacities.get(type)).doubleValue();
                         }
                     }
                 } else {
