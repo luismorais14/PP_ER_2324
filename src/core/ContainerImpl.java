@@ -19,7 +19,7 @@ import java.time.LocalDate;
 public class ContainerImpl implements Container {
     private ContainerType containerType;
     private double capacity;
-    private MeasurementsManagement measurements;
+    private MeasurementsManagement measurements = new MeasurementsManagement();
     private static int nMeasurements = 0;
     private String code;
 

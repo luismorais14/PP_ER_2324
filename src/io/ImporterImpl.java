@@ -201,9 +201,12 @@ public class ImporterImpl implements Importer {
                             System.out.println("Measurement não adicionado à coleção");
                             break;
                         }
-                        //todo resolver problema ao adicionar a measurement ao container, na instância de container, o array de measurements é null, daí dar throw à exceção ao adicionar
+                        ContainerImpl container = (ContainerImpl) this.containerManagement.getContainers()[j];
+                        //todo erros ao guardar measurements
+                        container.setMeasurements(this.measurementsManagement.getMeasurements());
                         if (!this.containerManagement.getContainers()[j].addMeasurement(measurement)) {
-                            System.out.println("Erro ao adicionar measurement ao container");
+                            System.out.println("Measurement não adicionado ao container");
+                            break;
                         }
                     }
                 }

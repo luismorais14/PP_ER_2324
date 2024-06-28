@@ -67,7 +67,7 @@ public class MeasurementsManagement {
             expandMeasurementsArray();
         }
         for (int i = 0; i < nMeasurements; i++) {
-            if (measurements[i].getDate().equals(measurement.getDate())) {
+            if (measurements[i].getDate().equals(measurement.getDate()) && measurements[i].getValue() == measurement.getValue()) {
                 return false;
             }
         }
@@ -150,8 +150,8 @@ public class MeasurementsManagement {
      */
     public boolean compareMeasurements(int[] positions, Measurement msrmnt) {
         boolean aux = true;
-        for (int i = 0; i < nMeasurements; i++) {
-            if (measurements[positions[i]].getValue() == msrmnt.getValue()) {
+        for (int i = 0; i < positions.length; i++) {
+            if (measurements[positions[i]].getValue() == msrmnt.getValue() && measurements[positions[i]].getDate().equals(msrmnt.getDate())) {
                 aux = false;
             }
         }
