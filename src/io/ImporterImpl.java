@@ -74,10 +74,8 @@ public class ImporterImpl implements Importer {
                 vehicleCode = jsonObject.get("code").toString();
                 VehicleImpl vehicle = new VehicleImpl(vehicleCode);
                 vehicle.setCapacities();
-                if (vehicleManagement.addVehicle(vehicle)) {
-                    System.out.println("Veículo adicionado com sucesso");
-                } else {
-                    System.out.println("Veículo não adicionado");
+                if (!vehicleManagement.addVehicle(vehicle)) {
+                    System.out.println("Erro ao adicionar veículo");
                 }
             }
         } catch (FileNotFoundException ex) {
