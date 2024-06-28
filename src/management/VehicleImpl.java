@@ -76,20 +76,17 @@ public class VehicleImpl implements Vehicle {
         try {
             FileReader fileReader = new FileReader("JSONFiles\\Vehicles.json");
             ja = (JSONArray) parser.parse(fileReader);
-            for (Object obj : ja) {
-                JSONObject jsonObject = (JSONObject) obj;
+            for (int i = 0; i < ja.size(); i++) {
+                JSONObject jsonObject = (JSONObject) ja.get(i);
                 String vehicleCode = (String) jsonObject.get("code");
                 if (vehicleCode.compareTo(this.code) == 0) {
                     JSONObject capacities = (JSONObject) jsonObject.get("capacity");
-                    for (int i = 0; i < capacities.size(); i++) {
-                        String type = TypesManagement.getTypes()[i];
+                    for (int j = 0; j < capacities.size(); j++) {
+                        String type = TypesManagement.getTypes()[j];
                         if (capacities.get(type) != null) {
-                            this.capacities[i] = ((Number) capacities.get(type)).doubleValue();
+                            this.capacities[j] = ((Number) capacities.get(type)).doubleValue();
                         }
                     }
-                } else {
-                    System.out.println("There is no such vehicle with that code.");
-                    return;
                 }
             }
         } catch (ParseException ex) {

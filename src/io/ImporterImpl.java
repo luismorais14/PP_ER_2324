@@ -9,17 +9,15 @@
  */
 package io;
 
-import com.estg.core.AidBox;
 import com.estg.core.ContainerType;
 import com.estg.core.Institution;
+import com.estg.core.Measurement;
 import com.estg.core.exceptions.AidBoxException;
-import com.estg.core.exceptions.ContainerException;
 import com.estg.core.exceptions.InstitutionException;
+import com.estg.core.exceptions.MeasurementException;
 import com.estg.core.exceptions.VehicleException;
 import com.estg.io.Importer;
-import core.AidBoxImpl;
-import core.ContainerImpl;
-import core.TypesManagement;
+import core.*;
 import management.VehicleImpl;
 import management.VehicleManagement;
 import org.json.simple.JSONArray;
@@ -30,9 +28,17 @@ import org.json.simple.parser.ParseException;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 
 
 public class ImporterImpl implements Importer {
+
+    ContainerManagement containerManagement = new ContainerManagement();
+    VehicleManagement vehicleManagement = new VehicleManagement();
+    MeasurementsManagement measurementsManagement = new MeasurementsManagement();
+
 
 
     @Override
@@ -43,21 +49,23 @@ public class ImporterImpl implements Importer {
         try {
             this.readContainerTypes();
             this.readVehicles();
-            //todo ler containers
-            //todo ler measurements
-            this.readAidBoxes(instn);
-        } catch (ContainerException ex) {
-            System.out.println(ex.getMessage());
+            this.readContrainers();
+            this.readMeasurements();
+            //todo ler aidboxes
         } catch (VehicleException ex) {
             System.out.println(ex.getMessage());
         }
+
     }
 
+    /**
+     * Método responsável por ler os veículos da WEBAPI
+     * @throws VehicleException exceção a ser lançada caso o veículo a ser adicionado à coleção seja null
+     */
     private void readVehicles() throws VehicleException {
         JSONParser parser = new JSONParser();
         JSONArray ja;
         String vehicleCode;
-        VehicleManagement vehicleManagement = new VehicleManagement();
 
         try {
             ja = (JSONArray) parser.parse(new FileReader("JSONFiles\\Vehicles.json"));
@@ -81,7 +89,11 @@ public class ImporterImpl implements Importer {
         }
     }
 
-    private void readAidBoxes(Institution instn) throws ContainerException {
+    /**
+     * Método responsável por ler as aidboxes da WEBAPI
+     * @param instn
+     */
+    private void readAidBoxes(Institution instn) {
         JSONParser parser = new JSONParser();
         JSONArray aidboxesArray;
         JSONArray containerArray;
@@ -107,10 +119,8 @@ public class ImporterImpl implements Importer {
                     containers[j].setCode(containerCode);
                 }
                 AidBox.setContainerManagement(containers);
-                if (instn.addAidBox(AidBox)) {
-                    System.out.println("AidBox added successfully");
-                } else {
-                    System.out.println("AidBox not added successfully");
+                if (!instn.addAidBox(AidBox)) {
+                    System.out.println("Erro ao adicionar AidBox");
                 }
             }
         } catch (FileNotFoundException ex) {
@@ -124,32 +134,35 @@ public class ImporterImpl implements Importer {
         }
     }
 
-    private void getContainers() throws ContainerException {
+    /**
+     * Método responsável por ler os containers da WEBAPI
+     */
+    private void readContrainers() {
         JSONParser parser = new JSONParser();
         JSONArray containerArray;
         double containerCapacity;
         ContainerType containerType;
         String typeStr;
+        String containerCode;
 
         try {
-            containerArray = (JSONArray) parser.parse("JSONFiles\\Containers.json");
-            for (int i = 0; i < .length; i++) {
-                for (int j = 0; j < containerArray.size(); j++) {
-                    JSONObject obj = (JSONObject) containerArray.get(i);
-                    if (aidBox.getContainers()[i].getCode().compareTo(obj.get("code").toString()) == 0) {
-                        containerCapacity = (Double) obj.get("capacity");
-                        typeStr = obj.get("type").toString();
-                        containerType = TypesManagement.findByType(typeStr);
-
-                        ContainerImpl tmpContainer = (ContainerImpl) aidBox.getContainers()[i];
-                        tmpContainer.setCapacity(containerCapacity);
-                        tmpContainer.setItemType(containerType);
-                        tmpContainer.setCode(aidBox.getContainers()[i].getCode());
-                        aidBox.addContainer(tmpContainer);
-                    }
+            containerArray = (JSONArray) parser.parse(new FileReader("JSONFiles\\Containers.json"));
+            for (int i = 0; i < containerArray.size(); i++) {
+                JSONObject obj = (JSONObject) containerArray.get(i);
+                containerCode = obj.get("code").toString();
+                typeStr = obj.get("type").toString();
+                containerType = TypesManagement.findByType(typeStr);
+                containerCapacity = ((Number) obj.get("capacity")).doubleValue();
+                ContainerImpl container = new ContainerImpl(containerType, containerCapacity, containerCode);
+                if (!containerManagement.addContainer(container)) {
+                    System.out.println("Erro ao adicionar container");
                 }
             }
         } catch (ParseException ex) {
+            System.out.println(ex.getMessage());
+        } catch (FileNotFoundException ex) {
+            System.out.println(ex.getMessage());
+        } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
     }
@@ -161,4 +174,49 @@ public class ImporterImpl implements Importer {
         TypesManagement.setContainerTypes();
     }
 
+    /**
+     * Método responsável por ler as measurements da WEBAPI
+     */
+    private void readMeasurements() {
+        JSONParser parser = new JSONParser();
+        JSONArray measurementsArray;
+        double measurementValue;
+        String date;
+        LocalDateTime measurementDate = null;
+
+        try {
+            measurementsArray = (JSONArray) parser.parse(new FileReader("JSONFiles\\Readings.json"));
+            for (int i = 0; i < measurementsArray.size(); i++) {
+                JSONObject obj = (JSONObject) measurementsArray.get(i);
+                for (int j = 0; j < containerManagement.getContainers().length; j++) {
+                    if (this.containerManagement.getContainers()[j].getCode().compareTo(obj.get("contentor").toString()) == 0) {
+                        date = obj.get("data").toString();
+                        try {
+                            Instant instant = Instant.parse(date);
+                            measurementDate = LocalDateTime.ofInstant(instant, java.time.ZoneOffset.UTC);
+                        } catch (DateTimeParseException ex) {
+                            System.out.println(ex.getMessage());
+                        }
+                        measurementValue = ((Number) obj.get("valor")).doubleValue();
+                        MeasurementImpl measurement = new MeasurementImpl(measurementDate, measurementValue);
+                        if (!measurementsManagement.addMeasurement(measurement)) {
+                            System.out.println("Measurement não adicionado à coleção");
+                            break;
+                        }
+                        //todo resolver problema ao adicionar a measurement ao container, na instância de container, o array de measurements é null, daí dar throw à exceção ao adicionar
+                        if (!this.containerManagement.getContainers()[j].addMeasurement(measurement)) {
+                            System.out.println("Erro ao adicionar measurement ao container");
+                        }
+                    }
+                }
+            }
+        } catch (ParseException ex) {
+            System.out.println(ex.getMessage());
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        } catch (MeasurementException ex) {
+            System.out.println(ex.getMessage());
+        }
+
+    }
 }

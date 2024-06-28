@@ -19,7 +19,7 @@ import java.time.LocalDate;
 public class ContainerImpl implements Container {
     private ContainerType containerType;
     private double capacity;
-    private MeasurementsManagement measurements = new MeasurementsManagement();
+    private MeasurementsManagement measurements;
     private static int nMeasurements = 0;
     private String code;
 
@@ -32,19 +32,20 @@ public class ContainerImpl implements Container {
         this.code = null;
         this.measurements = new MeasurementsManagement();
     }
+
     /**Construtor de Container
      *
      * @param it Tipo do container
      * @param capacity capacidade do conteiner
-     * @param measurements array de medições
      * @param code Coordenadas da Aidbox
      */
-    public ContainerImpl(ContainerType it, double capacity, Measurement[] measurements, String code) {
+    public ContainerImpl(ContainerType it, double capacity, String code) {
         this.containerType = it;
         this.capacity = capacity;
-        this.measurements.setMeasurements(measurements);
         this.code = code;
     }
+
+
     /**Metodo responsável por especificar o código do container
      *
      * @param code código do container
