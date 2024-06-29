@@ -4,7 +4,7 @@ import com.estg.core.exceptions.VehicleException;
 import com.estg.pickingManagement.Vehicle;
 
 public class VehicleManagement {
-    private final int ARRAY_SIZE = 10;
+    private final int ARRAY_SIZE = 0;
 
     private Vehicle[] vehicles;
     private Vehicle[] enabledVehicles;
@@ -91,7 +91,7 @@ public class VehicleManagement {
         if (vehicle == null) {
             throw new VehicleException("Null vehicle");
         }
-        if (nVehicles == this.vehicles.length - 1) {
+        if (nVehicles == this.vehicles.length) {
             expandVehicleArray();
         }
         if (this.verifyVehicleExistence(vehicle)) {
@@ -115,13 +115,12 @@ public class VehicleManagement {
         }
         if (index == nVehicles) {
             this.vehicles[index] = null;
-            nVehicles--;
         } else {
             for (int i = index; i < nVehicles - index - 1; i++) {
                 this.vehicles[i] = this.vehicles[i + 1];
             }
-            nVehicles--;
         }
+        nVehicles--;
     }
 
     /**
@@ -139,7 +138,7 @@ public class VehicleManagement {
         if (!verifyVehicleExistence(vehicle)) {
             throw new VehicleException("Vehicle does not exist");
         }
-        if (nEnabledVehicles == this.enabledVehicles.length - 1) {
+        if (nEnabledVehicles == this.enabledVehicles.length) {
             expandActiveVehicleArray();
         } else {
             this.enabledVehicles[nEnabledVehicles] = vehicle;
@@ -173,7 +172,7 @@ public class VehicleManagement {
         if (!verifyVehicleExistence(vehicle)) {
             throw new VehicleException("Vehicle does not exist");
         }
-        if (nDisabledVehicles == this.disabledVehicles.length - 1) {
+        if (nDisabledVehicles == this.disabledVehicles.length) {
             expandDisabledVehicleArray();
         } else {
             this.disabledVehicles[nDisabledVehicles] = vehicle;
@@ -196,7 +195,7 @@ public class VehicleManagement {
      * Expande a capacidade do array de veículos.
      */
     private void expandVehicleArray() {
-        Vehicle[] newArray = new Vehicle[ARRAY_SIZE + 5];
+        Vehicle[] newArray = new Vehicle[this.vehicles.length + 5];
         for (int i = 0; i < nVehicles; i++) {
             newArray[i] = this.vehicles[i];
         }
@@ -313,7 +312,7 @@ public class VehicleManagement {
      * Expande a capacidade do array de veículos habilitados.
      */
     private void expandActiveVehicleArray() {
-        Vehicle[] newArray = new Vehicle[ARRAY_SIZE + 5];
+        Vehicle[] newArray = new Vehicle[this.enabledVehicles.length + 5];
         for (int i = 0; i < nEnabledVehicles; i++) {
             newArray[i] = this.enabledVehicles[i];
         }
@@ -324,7 +323,7 @@ public class VehicleManagement {
      * Expande a capacidade do array de veículos desabilitados.
      */
     private void expandDisabledVehicleArray() {
-        Vehicle[] newArray = new Vehicle[ARRAY_SIZE + 5];
+        Vehicle[] newArray = new Vehicle[this.disabledVehicles.length + 5];
         for (int i = 0; i < nDisabledVehicles; i++) {
             newArray[i] = this.disabledVehicles[i];
         }

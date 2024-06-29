@@ -41,16 +41,20 @@ public class InstitutionImpl implements Institution {
     private final int ARRAY_SIZE = 10;
 
     private String InstitutionName;
-    private PickingMapManagement pickingMaps = new PickingMapManagement();
-    private AidBoxManagement aidboxes = new AidBoxManagement();
-    private MeasurementsManagement measurements = new MeasurementsManagement();
-    private VehicleManagement vehiclesManagement = new VehicleManagement();
+    private PickingMapManagement pickingMaps;
+    private AidBoxManagement aidboxes;
+    private MeasurementsManagement measurements;
+    private VehicleManagement vehiclesManagement;
 
     /**
      * Construtor de Institution
      */
     public InstitutionImpl() {
         this.InstitutionName = null;
+        this.aidboxes = new AidBoxManagement();
+        this.measurements = new MeasurementsManagement();
+        this.vehiclesManagement = new VehicleManagement();
+        this.pickingMaps = new PickingMapManagement();
     }
 
     /**
@@ -94,7 +98,7 @@ public class InstitutionImpl implements Institution {
      *
      * @param aidBox as novas aidboxes a serem atribuídas à instituição
      */
-    public void setAidBox(AidBox[] aidBox) {
+    public void setAidBoxes(AidBox[] aidBox) {
         this.aidboxes.setAidBox(aidBox);
     }
 

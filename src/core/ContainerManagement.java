@@ -13,7 +13,7 @@ import com.estg.core.Container;
 import com.estg.core.exceptions.AidBoxException;
 
 public class ContainerManagement {
-    private final int ARRAY_SIZE = 10;
+    private final int ARRAY_SIZE = 0;
 
     private Container[] containers;
     private static int nContainers = 0;
@@ -27,6 +27,7 @@ public class ContainerManagement {
 
     /**
      * Método responsável por especificar a coleção de containers
+     *
      * @param containers a coleção de containers
      */
     public void setContainers(Container[] containers) {
@@ -35,6 +36,7 @@ public class ContainerManagement {
 
     /**
      * Método responsável por retornar o número de containers na coleção
+     *
      * @return o número de containers na coleção
      */
     public int getnContainers() {
@@ -43,6 +45,7 @@ public class ContainerManagement {
 
     /**
      * Método responsável por retornar a coleção de containers
+     *
      * @return a coleção de containers
      */
     public Container[] getContainers() {
@@ -59,21 +62,20 @@ public class ContainerManagement {
         if (cntnr == null) {
             return false;
         }
-        if (nContainers == this.containers.length - 1) {
-            expandContainerArray();
-        }
-
         if (checkContainerExistence(cntnr)) {
             return false;
-        } else {
-            this.containers[nContainers] = cntnr;
-            nContainers++;
+        } else if (nContainers == this.containers.length) {
+            this.expandContainerArray();
         }
+
+        this.containers[nContainers] = cntnr;
+        nContainers++;
         return true;
     }
 
     /**
      * Método responsável por remover um container da coleção
+     *
      * @param cntnr o container a ser removido
      * @throws AidBoxException se o container recebido como parâmetro não existir
      */
@@ -140,6 +142,7 @@ public class ContainerManagement {
 
     /**
      * Método responsável por verificar se já existe no array um container do tipo do container recebido como parâmetro
+     *
      * @param container o container a verificar se existe um daquele tipo
      * @return o sucesso ou insucesso da operação
      */

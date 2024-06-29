@@ -1,11 +1,11 @@
 /*
-* Nome: Francisco Morais de Oliveira
-* Número: 8230204
-* Turma: T3
-*
-* Nome: Luís André Nunes Morais
-* Número: 8230258
-* Turma: T3
+ * Nome: Francisco Morais de Oliveira
+ * Número: 8230204
+ * Turma: T3
+ *
+ * Nome: Luís André Nunes Morais
+ * Número: 8230258
+ * Turma: T3
  */
 package io;
 
@@ -32,17 +32,24 @@ import java.time.format.DateTimeParseException;
 
 public class ImporterImpl implements Importer {
 
+    ContainerManagement containerManagement = new ContainerManagement();
+    MeasurementsManagement measurementsManagement = new MeasurementsManagement();
+    AidBoxManagement aidBoxManagement = new AidBoxManagement();
+
+
     @Override
     public void importData(Institution instn) throws FileNotFoundException, IOException, InstitutionException {
         if (instn == null) {
             throw new InstitutionException("Institution object is null");
         }
+
         try {
             this.readContainerTypes();
             this.readVehicles(instn);
-            this.readContrainers(instn);
-            this.readMeasurements(instn);
-            //todo ler aidboxes
+            this.readContainers();
+            this.readMeasurements();
+            this.readAidBoxes(instn);
+            this.addMeasurementsToInstitution(instn);
         } catch (VehicleException ex) {
             System.out.println(ex.getMessage());
         }
@@ -51,6 +58,8 @@ public class ImporterImpl implements Importer {
 
     /**
      * Método responsável por ler os veículos da WEBAPI
+     *
+     * @param instn instituição onde serão guardados os dados
      * @throws VehicleException exceção a ser lançada caso o veículo a ser adicionado à coleção seja null
      */
     private void readVehicles(Institution instn) throws VehicleException {
@@ -81,6 +90,7 @@ public class ImporterImpl implements Importer {
 
     /**
      * Método responsável por ler as aidboxes da WEBAPI
+     *
      * @param instn
      */
     private void readAidBoxes(Institution instn) {
@@ -91,6 +101,7 @@ public class ImporterImpl implements Importer {
         String aidboxZone;
         String containerCode;
         ContainerImpl[] containers;
+        InstitutionImpl institution = (InstitutionImpl) instn;
 
         try {
             aidboxesArray = (JSONArray) parser.parse(new FileReader("JSONFiles\\AidBoxes.json"));
@@ -104,14 +115,18 @@ public class ImporterImpl implements Importer {
                 containers = new ContainerImpl[containerArray.size()];
                 for (int j = 0; j < containerArray.size(); j++) {
                     containerCode = containerArray.get(j).toString();
-                    //todo procurar container por instância já criada
-                    containers[j] = new ContainerImpl();
-                    containers[j].setCode(containerCode);
+                    for (int k = 0; k < this.containerManagement.getContainers().length; k++) {
+                        if (containerCode.compareTo(this.containerManagement.getContainers()[k].getCode()) == 0) {
+                            containers[j] = (ContainerImpl) this.containerManagement.getContainers()[k];
+                            break;
+                        }
+                    }
                 }
                 AidBox.setContainerManagement(containers);
-                if (!instn.addAidBox(AidBox)) {
-                    System.out.println("Erro ao adicionar AidBox");
+                if (!this.aidBoxManagement.addAidBox(AidBox)) {
+                    System.out.println("Erro ao adicionar aidbox");
                 }
+                institution.setAidBoxes(this.aidBoxManagement.getAidBoxes());
             }
         } catch (FileNotFoundException ex) {
             System.out.println(ex.getMessage());
@@ -119,22 +134,19 @@ public class ImporterImpl implements Importer {
             System.out.println(ex.getMessage());
         } catch (ParseException ex) {
             System.out.println(ex.getMessage());
-        } catch (AidBoxException ex) {
-            System.out.println(ex.getMessage());
         }
     }
 
     /**
      * Método responsável por ler os containers da WEBAPI
      */
-    private void readContrainers(Institution instn) {
+    private void readContainers() {
         JSONParser parser = new JSONParser();
         JSONArray containerArray;
         double containerCapacity;
         ContainerType containerType;
         String typeStr;
         String containerCode;
-        InstitutionImpl institution = (InstitutionImpl) instn;
 
         try {
             containerArray = (JSONArray) parser.parse(new FileReader("JSONFiles\\Containers.json"));
@@ -145,10 +157,8 @@ public class ImporterImpl implements Importer {
                 containerType = TypesManagement.findByType(typeStr);
                 containerCapacity = ((Number) obj.get("capacity")).doubleValue();
                 ContainerImpl container = new ContainerImpl(containerType, containerCapacity, containerCode);
-                for (int j = 0; j < institution.getAidBoxes().length; j++) {
-                    if (!instn.getAidBoxes()[j].addContainer(container)) {
-                        System.out.println("Erro ao adicionar container");
-                    }
+                if (!this.containerManagement.addContainer(container)) {
+                    System.out.println("Erro ao adicionar container");
                 }
             }
         } catch (ParseException ex) {
@@ -156,8 +166,6 @@ public class ImporterImpl implements Importer {
         } catch (FileNotFoundException ex) {
             System.out.println(ex.getMessage());
         } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-        } catch (ContainerException ex) {
             System.out.println(ex.getMessage());
         }
     }
@@ -172,7 +180,7 @@ public class ImporterImpl implements Importer {
     /**
      * Método responsável por ler as measurements da WEBAPI
      */
-    private void readMeasurements(Institution instn) {
+    private void readMeasurements() {
         JSONParser parser = new JSONParser();
         JSONArray measurementsArray;
         double measurementValue;
@@ -183,23 +191,23 @@ public class ImporterImpl implements Importer {
             measurementsArray = (JSONArray) parser.parse(new FileReader("JSONFiles\\Readings.json"));
             for (int i = 0; i < measurementsArray.size(); i++) {
                 JSONObject obj = (JSONObject) measurementsArray.get(i);
-                for (int j = 0; j < instn.getAidBoxes().length; j++) {
-                    for (int k = 0; k < instn.getAidBoxes()[j].getContainers().length; k++) {
-                        if (instn.getAidBoxes()[j].getContainers()[k].getCode().compareTo(obj.get("contentor").toString()) == 0) {
-                            date = obj.get("data").toString();
-                            try {
-                                Instant instant = Instant.parse(date);
-                                measurementDate = LocalDateTime.ofInstant(instant, java.time.ZoneOffset.UTC);
-                            } catch (DateTimeParseException ex) {
-                                System.out.println(ex.getMessage());
-                            }
-                            measurementValue = ((Number) obj.get("valor")).doubleValue();
-                            MeasurementImpl measurement = new MeasurementImpl(measurementDate, measurementValue);
-                            if (!instn.getAidBoxes()[j].getContainers()[k].addMeasurement(measurement)) {
-                                System.out.println("Measurement não adicionado à coleção");
-                                break;
-                            }
+                for (int j = 0; j < this.containerManagement.getContainers().length; j++) {
+                    if (this.containerManagement.getContainers()[j].getCode().compareTo(obj.get("contentor").toString()) == 0) {
+                        date = obj.get("data").toString();
+                        try {
+                            Instant instant = Instant.parse(date);
+                            measurementDate = LocalDateTime.ofInstant(instant, java.time.ZoneOffset.UTC);
+                        } catch (DateTimeParseException ex) {
+                            System.out.println(ex.getMessage());
                         }
+                        measurementValue = ((Number) obj.get("valor")).doubleValue();
+                        MeasurementImpl measurement = new MeasurementImpl(measurementDate, measurementValue);
+                        if (!this.measurementsManagement.addMeasurement(measurement)) {
+                            System.out.println("Erro ao adicionar measurement");
+                        }
+                        ContainerImpl container = (ContainerImpl) this.containerManagement.getContainers()[j];
+                        container.setMeasurements(this.measurementsManagement.getMeasurements());
+                        break;
                     }
                 }
             }
@@ -207,9 +215,15 @@ public class ImporterImpl implements Importer {
             System.out.println(ex.getMessage());
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
-        } catch (MeasurementException ex) {
-            System.out.println(ex.getMessage());
         }
+    }
 
+    /**
+     * Método responsável por carregar as measurements para a instituição recebida como parâmetro
+     * @param inst a instituição a adicionar as medições
+     */
+    private void addMeasurementsToInstitution(Institution inst) {
+        InstitutionImpl institution = (InstitutionImpl) inst;
+        institution.setMeasurement(this.measurementsManagement.getMeasurements());
     }
 }

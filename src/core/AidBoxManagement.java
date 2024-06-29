@@ -15,7 +15,7 @@ import com.estg.core.exceptions.AidBoxException;
 import com.estg.pickingManagement.Vehicle;
 
 public class AidBoxManagement {
-    private final int ARRAY_SIZE = 10;
+    private final int ARRAY_SIZE = 0;
 
     private AidBox[] aidboxes;
     private static int nAidBoxes = 0;
@@ -38,26 +38,32 @@ public class AidBoxManagement {
 
     /**
      * Método responsável por adicionar uma aidbox à coleção
+     *
      * @param aidbox a aidbox a ser adicionada
      * @return o sucesso ou insucesso da operação
      */
     public boolean addAidBox(AidBox aidbox) {
         for (int i = 0; i < aidboxes.length; i++) {
-            AidBoxImpl tmpAidBox = (AidBoxImpl) this.aidboxes[i];
-            if (tmpAidBox.equals(aidbox)) {
-                return false;
+            if (nAidBoxes > 0) {
+                if (this.aidboxes[i] != null) {
+                    AidBoxImpl tmpAidBox = (AidBoxImpl) this.aidboxes[i];
+                    if (tmpAidBox.equals(aidbox)) {
+                        return false;
+                    }
+                }
             }
         }
-        if (nAidBoxes == this.aidboxes.length - 1) {
+        if (nAidBoxes == this.aidboxes.length) {
             this.expandAidBoxArray();
         }
-        aidboxes[nAidBoxes] = aidbox;
+        this.aidboxes[nAidBoxes] = aidbox;
         nAidBoxes++;
         return true;
     }
 
     /**
      * Método responsável por remover uma aidbox da coleção
+     *
      * @param aidbox a adibox a ser removida
      * @throws AidBoxException exceção a ser lançada caso a aidbox seja null ou não exista
      */
@@ -80,6 +86,7 @@ public class AidBoxManagement {
 
     /**
      * Método responsável por retornar a coleção de aidboxes
+     *
      * @return a coleção de aidboxes
      */
     public AidBox[] getAidBoxes() {
@@ -100,7 +107,7 @@ public class AidBoxManagement {
 
         for (int i = 0; i < containers.length; i++) {
             if (containers[i] != null) {
-                for (int j = i; j < containers.length - i; j++) {
+                for (int j = i + 1; j < containers.length - i; j++) {
                     if (containers[j] != null) {
                         if (containers[i].getType().equals(containers[j].getType())) {
                             return true;
@@ -132,15 +139,16 @@ public class AidBoxManagement {
      * Expande a capacidade do array de aidboxes
      */
     public void expandAidBoxArray() {
-        AidBox[] newArray = new AidBox[ARRAY_SIZE * 2];
+        AidBox[] newArray = new AidBox[this.aidboxes.length + 5];
         for (int i = 0; i < nAidBoxes; i++) {
-            newArray[i] = aidboxes[i];
+            newArray[i] = this.aidboxes[i];
         }
         this.aidboxes = newArray;
     }
 
     /**
      * Método responsável por verificar se uma aidbox já existe na coleção
+     *
      * @param aidbox aidbox a ser verificada
      * @return o sucesso ou insucesso da operação
      */
@@ -165,11 +173,9 @@ public class AidBoxManagement {
     public boolean verifyCompatibility(AidBox aidbox, Vehicle vhcl) {
         boolean aux = false;
         int tmpCounter = 0;
-        for (int i = 0; i < this.aidboxes.length; i++) {
-            for (int j = 0; j < this.aidboxes[i].getContainers().length; j++) {
-                if (vhcl.getCapacity(this.aidboxes[i].getContainers()[j].getType()) != 0.0) {
-                    tmpCounter++;
-                }
+        for (int i = 0; i < aidbox.getContainers().length; i++) {
+            if (vhcl.getCapacity(aidbox.getContainers()[i].getType()) != 0.0) {
+                tmpCounter++;
             }
         }
         if (tmpCounter != 0) {

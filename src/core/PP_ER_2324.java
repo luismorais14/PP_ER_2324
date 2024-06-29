@@ -43,7 +43,7 @@ public class PP_ER_2324 {
 
         System.out.println("Importer test");
         for (int i = 0; i < instn.getAidBoxes().length; i++) {
-            System.out.println(instn.getAidBoxes()[i].toString());
+            System.out.println(instn.getAidBoxes()[0].toString());
         }
     }
 

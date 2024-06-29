@@ -13,7 +13,7 @@ import com.estg.core.Measurement;
 import com.estg.core.exceptions.MeasurementException;
 
 public class MeasurementsManagement {
-    private final int ARRAY_SIZE = 10;
+    private final int ARRAY_SIZE = 0;
 
     private Measurement[] measurements;
     private static int nMeasurements = 0;
@@ -63,7 +63,7 @@ public class MeasurementsManagement {
         if (measurement == null) {
             return false;
         }
-        if (nMeasurements == this.measurements.length - 1) {
+        if (nMeasurements == this.measurements.length) {
             expandMeasurementsArray();
         }
         for (int i = 0; i < nMeasurements; i++) {
@@ -183,9 +183,11 @@ public class MeasurementsManagement {
     @Override
     public String toString() {
         String txt = "";
-        for (int i = 0; i < this.measurements.length; i++) {
-            if (this.measurements[i] != null) {
-                txt += this.measurements[i].toString() + "\n";
+        if (this.measurements != null) {
+            for (int i = 0; i < this.measurements.length; i++) {
+                if (this.measurements[i] != null) {
+                    txt += this.measurements[i].toString() + "\n";
+                }
             }
         }
         return txt;
