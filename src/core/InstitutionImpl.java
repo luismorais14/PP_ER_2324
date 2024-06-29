@@ -108,6 +108,14 @@ public class InstitutionImpl implements Institution {
     }
 
     /**
+     * Método responsável por especificar a coleção de veículos
+     * @param vehicles a coleçao de veículos
+     */
+    public void setVehicles(Vehicle[] vehicles) {
+        this.vehiclesManagement.setVehicles(vehicles);
+    }
+
+    /**
      * Define os veículos habilitados associados à instituição.
      *
      * @param vehicle os novos veículos habilitados a serem atribuídos à

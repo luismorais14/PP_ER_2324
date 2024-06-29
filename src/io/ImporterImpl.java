@@ -12,10 +12,7 @@ package io;
 import com.estg.core.ContainerType;
 import com.estg.core.Institution;
 import com.estg.core.Measurement;
-import com.estg.core.exceptions.AidBoxException;
-import com.estg.core.exceptions.InstitutionException;
-import com.estg.core.exceptions.MeasurementException;
-import com.estg.core.exceptions.VehicleException;
+import com.estg.core.exceptions.*;
 import com.estg.io.Importer;
 import core.*;
 import management.VehicleImpl;
@@ -35,12 +32,6 @@ import java.time.format.DateTimeParseException;
 
 public class ImporterImpl implements Importer {
 
-    ContainerManagement containerManagement = new ContainerManagement();
-    VehicleManagement vehicleManagement = new VehicleManagement();
-    MeasurementsManagement measurementsManagement = new MeasurementsManagement();
-
-
-
     @Override
     public void importData(Institution instn) throws FileNotFoundException, IOException, InstitutionException {
         if (instn == null) {
@@ -48,9 +39,9 @@ public class ImporterImpl implements Importer {
         }
         try {
             this.readContainerTypes();
-            this.readVehicles();
-            this.readContrainers();
-            this.readMeasurements();
+            this.readVehicles(instn);
+            this.readContrainers(instn);
+            this.readMeasurements(instn);
             //todo ler aidboxes
         } catch (VehicleException ex) {
             System.out.println(ex.getMessage());
@@ -62,10 +53,11 @@ public class ImporterImpl implements Importer {
      * Método responsável por ler os veículos da WEBAPI
      * @throws VehicleException exceção a ser lançada caso o veículo a ser adicionado à coleção seja null
      */
-    private void readVehicles() throws VehicleException {
+    private void readVehicles(Institution instn) throws VehicleException {
         JSONParser parser = new JSONParser();
         JSONArray ja;
         String vehicleCode;
+        InstitutionImpl institution = (InstitutionImpl) instn;
 
         try {
             ja = (JSONArray) parser.parse(new FileReader("JSONFiles\\Vehicles.json"));
@@ -74,7 +66,7 @@ public class ImporterImpl implements Importer {
                 vehicleCode = jsonObject.get("code").toString();
                 VehicleImpl vehicle = new VehicleImpl(vehicleCode);
                 vehicle.setCapacities();
-                if (!vehicleManagement.addVehicle(vehicle)) {
+                if (!institution.addVehicle(vehicle)) {
                     System.out.println("Erro ao adicionar veículo");
                 }
             }
@@ -135,13 +127,14 @@ public class ImporterImpl implements Importer {
     /**
      * Método responsável por ler os containers da WEBAPI
      */
-    private void readContrainers() {
+    private void readContrainers(Institution instn) {
         JSONParser parser = new JSONParser();
         JSONArray containerArray;
         double containerCapacity;
         ContainerType containerType;
         String typeStr;
         String containerCode;
+        InstitutionImpl institution = (InstitutionImpl) instn;
 
         try {
             containerArray = (JSONArray) parser.parse(new FileReader("JSONFiles\\Containers.json"));
@@ -152,8 +145,10 @@ public class ImporterImpl implements Importer {
                 containerType = TypesManagement.findByType(typeStr);
                 containerCapacity = ((Number) obj.get("capacity")).doubleValue();
                 ContainerImpl container = new ContainerImpl(containerType, containerCapacity, containerCode);
-                if (!containerManagement.addContainer(container)) {
-                    System.out.println("Erro ao adicionar container");
+                for (int j = 0; j < institution.getAidBoxes().length; j++) {
+                    if (!instn.getAidBoxes()[j].addContainer(container)) {
+                        System.out.println("Erro ao adicionar container");
+                    }
                 }
             }
         } catch (ParseException ex) {
@@ -161,6 +156,8 @@ public class ImporterImpl implements Importer {
         } catch (FileNotFoundException ex) {
             System.out.println(ex.getMessage());
         } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        } catch (ContainerException ex) {
             System.out.println(ex.getMessage());
         }
     }
@@ -175,7 +172,7 @@ public class ImporterImpl implements Importer {
     /**
      * Método responsável por ler as measurements da WEBAPI
      */
-    private void readMeasurements() {
+    private void readMeasurements(Institution instn) {
         JSONParser parser = new JSONParser();
         JSONArray measurementsArray;
         double measurementValue;
@@ -186,27 +183,22 @@ public class ImporterImpl implements Importer {
             measurementsArray = (JSONArray) parser.parse(new FileReader("JSONFiles\\Readings.json"));
             for (int i = 0; i < measurementsArray.size(); i++) {
                 JSONObject obj = (JSONObject) measurementsArray.get(i);
-                for (int j = 0; j < containerManagement.getContainers().length; j++) {
-                    if (this.containerManagement.getContainers()[j].getCode().compareTo(obj.get("contentor").toString()) == 0) {
-                        date = obj.get("data").toString();
-                        try {
-                            Instant instant = Instant.parse(date);
-                            measurementDate = LocalDateTime.ofInstant(instant, java.time.ZoneOffset.UTC);
-                        } catch (DateTimeParseException ex) {
-                            System.out.println(ex.getMessage());
-                        }
-                        measurementValue = ((Number) obj.get("valor")).doubleValue();
-                        MeasurementImpl measurement = new MeasurementImpl(measurementDate, measurementValue);
-                        if (!measurementsManagement.addMeasurement(measurement)) {
-                            System.out.println("Measurement não adicionado à coleção");
-                            break;
-                        }
-                        ContainerImpl container = (ContainerImpl) this.containerManagement.getContainers()[j];
-                        //todo erros ao guardar measurements
-                        container.setMeasurements(this.measurementsManagement.getMeasurements());
-                        if (!this.containerManagement.getContainers()[j].addMeasurement(measurement)) {
-                            System.out.println("Measurement não adicionado ao container");
-                            break;
+                for (int j = 0; j < instn.getAidBoxes().length; j++) {
+                    for (int k = 0; k < instn.getAidBoxes()[j].getContainers().length; k++) {
+                        if (instn.getAidBoxes()[j].getContainers()[k].getCode().compareTo(obj.get("contentor").toString()) == 0) {
+                            date = obj.get("data").toString();
+                            try {
+                                Instant instant = Instant.parse(date);
+                                measurementDate = LocalDateTime.ofInstant(instant, java.time.ZoneOffset.UTC);
+                            } catch (DateTimeParseException ex) {
+                                System.out.println(ex.getMessage());
+                            }
+                            measurementValue = ((Number) obj.get("valor")).doubleValue();
+                            MeasurementImpl measurement = new MeasurementImpl(measurementDate, measurementValue);
+                            if (!instn.getAidBoxes()[j].getContainers()[k].addMeasurement(measurement)) {
+                                System.out.println("Measurement não adicionado à coleção");
+                                break;
+                            }
                         }
                     }
                 }
