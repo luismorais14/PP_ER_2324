@@ -27,16 +27,18 @@ import org.json.simple.parser.ParseException;
 
 public class VehicleImpl implements Vehicle {
 
-    private final int ARRAY_SIZE = 10;
+    private final int ARRAY_SIZE = 0;
 
     private String code;
-    private double[] capacities = new double[ARRAY_SIZE];
+    private double[] capacities;
+    private static int nCapacities = 0;
 
     /**
      * Construtor de VehicleImpl
      */
     public VehicleImpl() {
         this.code = "";
+        this.capacities = new double[ARRAY_SIZE];
     }
 
     /**
@@ -46,6 +48,7 @@ public class VehicleImpl implements Vehicle {
      */
     public VehicleImpl(String code) {
         this.code = code;
+        this.capacities = new double[ARRAY_SIZE];
     }
 
     /**
@@ -81,6 +84,9 @@ public class VehicleImpl implements Vehicle {
                 String vehicleCode = (String) jsonObject.get("code");
                 if (vehicleCode.compareTo(this.code) == 0) {
                     JSONObject capacities = (JSONObject) jsonObject.get("capacity");
+                    if (nCapacities < capacities.size()) {
+                        this.expandArraySize(capacities.size());
+                    }
                     for (int j = 0; j < capacities.size(); j++) {
                         String type = TypesManagement.getTypes()[j];
                         if (capacities.get(type) != null) {
@@ -141,6 +147,17 @@ public class VehicleImpl implements Vehicle {
             txt += TypesManagement.getTypes()[i] + ": " + this.capacities[i] + "\n";
         }
         return txt;
+    }
+
+    /**
+     * Método responsável por expandir o array de capacidades
+     */
+    private void expandArraySize(int size) {
+        double[] newArray = new double[size];
+        for (int i = 0; i < nCapacities; i++) {
+            newArray[i] = this.capacities[i];
+        }
+        this.capacities = newArray;
     }
 
     @Override

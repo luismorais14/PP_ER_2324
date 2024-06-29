@@ -167,8 +167,9 @@ public class ContainerManagement {
     public String toString() {
         String txt = "";
         for (int i = 0; i < this.containers.length; i++) {
-            if (this.containers[i] != null) {
-                txt += this.containers[i].toString() + "\n";
+            ContainerImpl container = (ContainerImpl) this.containers[i];
+            if (container != null) {
+                txt += container.toString() + "\n";
             }
         }
         return txt;

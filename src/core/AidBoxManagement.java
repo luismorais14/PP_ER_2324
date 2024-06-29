@@ -205,8 +205,9 @@ public class AidBoxManagement {
     public String toString() {
         String txt = "";
         for (int i = 0; i < this.aidboxes.length; i++) {
+            AidBoxImpl aidbox = (AidBoxImpl) this.aidboxes[i];
             if (this.aidboxes[i] != null) {
-                txt += this.aidboxes[i].toString() + "\n";
+                txt += aidbox.toString() + "\n";
             }
         }
         return txt;

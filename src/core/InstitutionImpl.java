@@ -489,8 +489,8 @@ public class InstitutionImpl implements Institution {
 
     @Override
     public String toString() {
-        return "InstitutionImpl{" +
-                "InstitutionName='" + this.InstitutionName + '\'' +
+        return "InstitutionImpl\n{" +
+                "\nInstitutionName='" + this.InstitutionName + '\n' +
                 ", pickingMaps=" + this.pickingMaps.toString() +
                 ", aidboxes=" + this.aidboxes.toString() +
                 ", measurements=" + this.measurements.toString() +

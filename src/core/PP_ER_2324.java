@@ -29,8 +29,9 @@ public class PP_ER_2324 {
 
     public static void main(String[] args) throws AidBoxException, ContainerException, IOException, InstitutionException {
         DataHandler dh = new DataHandler();
-        Institution instn = new InstitutionImpl();
+        InstitutionImpl instn = new InstitutionImpl();
         ImporterImpl importer = new ImporterImpl();
+        instn.setInstitutionName("Cerci");
 
         dh.apiToAidBoxes();
         dh.apiToContainers();
@@ -42,9 +43,8 @@ public class PP_ER_2324 {
         importer.importData(instn);
 
         System.out.println("Importer test");
-        for (int i = 0; i < instn.getAidBoxes().length; i++) {
-            System.out.println(instn.getAidBoxes()[0].toString());
-        }
+        System.out.println("\n" + instn.toString());
+
     }
 
 }
