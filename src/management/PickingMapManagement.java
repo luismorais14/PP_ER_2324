@@ -81,13 +81,12 @@ public class PickingMapManagement {
         }
         if (index == nPickingMaps) {
             this.pickingMaps[index] = null;
-            nPickingMaps--;
         } else {
             for (int i = index; i < this.pickingMaps.length - index - 1; i++) {
                 this.pickingMaps[i] = this.pickingMaps[i + 1];
             }
-            nPickingMaps--;
         }
+        nPickingMaps--;
     }
 
     /**
