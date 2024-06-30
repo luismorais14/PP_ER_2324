@@ -20,6 +20,7 @@ import com.estg.pickingManagement.Vehicle;
 import io.DataHandler;
 import io.ImporterImpl;
 import management.PickingMapImpl;
+import management.RouteGeneratorImpl;
 import management.VehicleImpl;
 
 import java.io.IOException;
@@ -31,7 +32,7 @@ public class PP_ER_2324 {
         DataHandler dh = new DataHandler();
         InstitutionImpl instn = new InstitutionImpl();
         ImporterImpl importer = new ImporterImpl();
-        instn.setInstitutionName("Cerci");
+        RouteGeneratorImpl routeGen = new RouteGeneratorImpl();
 
         dh.apiToAidBoxes();
         dh.apiToContainers();
@@ -42,8 +43,8 @@ public class PP_ER_2324 {
 
         importer.importData(instn);
 
-        System.out.println("Importer test");
-        System.out.println("\n" + instn.toString());
+        routeGen.generateRoutes(instn);
+
 
     }
 
