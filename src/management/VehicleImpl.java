@@ -9,6 +9,7 @@
  */
 package management;
 
+import com.estg.core.Container;
 import com.estg.core.ContainerType;
 import com.estg.pickingManagement.Vehicle;
 
@@ -18,6 +19,8 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
+import core.ContainerImpl;
+import core.ContainerManagement;
 import core.ContainerTypeImpl;
 import core.TypesManagement;
 import org.json.simple.JSONArray;
@@ -32,6 +35,7 @@ public class VehicleImpl implements Vehicle {
     private String code;
     private double[] capacities;
     private static int nCapacities = 0;
+    private Container[][] emptyContainers;
 
     /**
      * Construtor de VehicleImpl
@@ -39,6 +43,8 @@ public class VehicleImpl implements Vehicle {
     public VehicleImpl() {
         this.code = "";
         this.capacities = new double[ARRAY_SIZE];
+        int typeCount = TypesManagement.getTypes().length;
+        this.emptyContainers = new Container[typeCount][];
     }
 
     /**
@@ -49,6 +55,8 @@ public class VehicleImpl implements Vehicle {
     public VehicleImpl(String code) {
         this.code = code;
         this.capacities = new double[ARRAY_SIZE];
+        int typeCount = TypesManagement.getTypes().length;
+        this.emptyContainers = new Container[typeCount][];
     }
 
     /**
@@ -58,6 +66,46 @@ public class VehicleImpl implements Vehicle {
      */
     public void setCode(String code) {
         this.code = code;
+    }
+
+    /**
+     * Método responsável por recolher um container
+     * @param container container a ser recolhido
+     * @return o sucesso ou insucesso da operação
+     */
+    public boolean pickContainer(Container container) {
+        if (container == null) {
+            return false;
+        }
+
+        ContainerTypeImpl type = (ContainerTypeImpl) container.getType();
+        String typeName = type.getType();
+        int typeIndex = -1;
+
+        for (int i = 0; i < TypesManagement.getTypes().length; i++) {
+            if (TypesManagement.getTypes()[i].compareTo(typeName) == 0) {
+                typeIndex = i;
+                break;
+            }
+        }
+
+        if (typeIndex == -1) {
+            return false;
+        }
+
+        if (this.emptyContainers[typeIndex] == null) {
+            return false;
+        }
+
+        Container[] containers = this.emptyContainers[typeIndex];
+        for (int i = 0; i < this.emptyContainers[typeIndex].length; i++) {
+            if (this.emptyContainers[typeIndex][i] == null) {
+                this.emptyContainers[typeIndex][i] = container;
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -91,6 +139,8 @@ public class VehicleImpl implements Vehicle {
                         String type = TypesManagement.getTypes()[j];
                         if (capacities.get(type) != null) {
                             this.capacities[j] = ((Number) capacities.get(type)).doubleValue();
+                            int numContainers = (int) this.capacities[j];
+                            this.emptyContainers[j] = new Container[numContainers];
                         }
                     }
                 }

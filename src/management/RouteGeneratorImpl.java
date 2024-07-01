@@ -1,11 +1,11 @@
 /*
-* Nome: Francisco Morais de Oliveira
-* Número: 8230204
-* Turma: T3
-*
-* Nome: Luís André Nunes Morais
-* Número: 8230258
-* Turma: T3
+ * Nome: Francisco Morais de Oliveira
+ * Número: 8230204
+ * Turma: T3
+ *
+ * Nome: Luís André Nunes Morais
+ * Número: 8230258
+ * Turma: T3
  */
 package management;
 
@@ -17,6 +17,7 @@ import com.estg.pickingManagement.Route;
 import com.estg.pickingManagement.RouteGenerator;
 import com.estg.pickingManagement.Vehicle;
 import core.AidBoxImpl;
+import core.ContainerTypeImpl;
 import core.InstitutionImpl;
 import core.TypesManagement;
 
@@ -44,17 +45,37 @@ public class RouteGeneratorImpl implements RouteGenerator {
     private void getPerishableFoodContainers(Institution instn) {
         InstitutionImpl institution = (InstitutionImpl) instn;
         Vehicle[] vehicles = institution.getVehicles();
-        int aidboxCounter = this.priorityAidboxesCount(instn);
-        ContainerType perishableFood = TypesManagement.findByType("perishable food");
-        AidBox[] priorityAidboxes = new AidBox[aidboxCounter];
-        int counter = 0;
+        ContainerType type = TypesManagement.findByType("perishable food");
+        int capacityIndex = this.findCapacityIndex(type);
 
-        for (int i = 0; i < institution.getAidBoxes().length; i++) {
-            if (institution.getAidBoxes()[i].getContainer(perishableFood).getType().equals(perishableFood)) {
-                priorityAidboxes[counter] = institution.getAidBoxes()[i];
+        for (int i = 0; i < vehicles.length; i++) { //for que percorre os veículos
+            VehicleImpl vehicle = (VehicleImpl) vehicles[i];
+            for (int j = 0; j < institution.getAidBoxes().length; j++) { //for que percorre aidboxes
+                for (int k = 0; k < institution.getAidBoxes()[j].getContainers().length; k++) { //for que percorre os containers
+                    if (institution.getAidBoxes()[j].getContainers()[k].getType().equals(type)) {
+                        vehicle.pickContainer(institution.getAidBoxes()[j].getContainers()[k]);
+                    }
+                }
             }
         }
 
+
+    }
+
+    /**
+     * Método responsável por procurar o index da capacidade correspondente ao tipo de container
+     *
+     * @param ct    o tipo a ser procurado
+     * @return o index
+     */
+    private int findCapacityIndex(ContainerType ct) {
+        ContainerTypeImpl type = (ContainerTypeImpl) ct;
+        for (int i = 0; i < TypesManagement.getTypes().length; i++) {
+            if (TypesManagement.getTypes()[i].compareTo(type.getType()) == 0) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     public boolean routeContainsContainer(Route route, Container container) {
@@ -91,7 +112,7 @@ public class RouteGeneratorImpl implements RouteGenerator {
         this.pickedContainer = pickedCount;
     }
 
-        public void calculateNonPickedContainers(Institution instn, Route[] routes) {
+    public void calculateNonPickedContainers(Institution instn, Route[] routes) {
         int nonPickedCount = 0;
 
         for (AidBox aidBox : instn.getAidBoxes()) {
@@ -115,21 +136,4 @@ public class RouteGeneratorImpl implements RouteGenerator {
 
         this.nonPickedContainer = nonPickedCount;
     }
-
-    /**
-     * Método responsável por retornar a quantidade de aidboxes 'prioritárias' (que possuem containers do tipo 'perishable food')
-     * @param institution instituição a procurar pelas aidboxes
-     * @return o número de aidboxes prioritárias
-     */
-    private int priorityAidboxesCount(Institution institution) {
-        ContainerType perishableFood = TypesManagement.findByType("perishable food");
-        int aidboxCounter = 0;
-        for (int i = 0; i < institution.getAidBoxes().length; i++) {
-            if (institution.getAidBoxes()[i].getContainer(perishableFood).getType().equals(perishableFood)) {
-                aidboxCounter++;
-            }
-        }
-        return aidboxCounter;
-    }
-    
 }

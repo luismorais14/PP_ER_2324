@@ -21,7 +21,7 @@ import core.AidBoxManagement;
 
 public class RouteImpl implements Route {
 
-    private AidBoxManagement aidBoxManagement = new AidBoxManagement();
+    private AidBoxManagement aidBoxManagement;
     private Vehicle vehicle;
     private Report report;
 
@@ -31,18 +31,18 @@ public class RouteImpl implements Route {
     public RouteImpl() {
         this.vehicle = null;
         this.report = null;
+        this.aidBoxManagement = new AidBoxManagement();
     }
 
     /**
      * Construtor de RouteImpl
      * @param vehicle o veículo da rota
      * @param report o report da rota
-     * @param aidBoxes a coleção de aidboxes da rota
      */
-    public RouteImpl(Vehicle vehicle, Report report, AidBox[] aidBoxes) {
+    public RouteImpl(Vehicle vehicle, Report report) {
         this.vehicle = vehicle;
         this.report = report;
-        this.aidBoxManagement.setAidBox(aidBoxes);
+        this.aidBoxManagement = new AidBoxManagement();
     }
 
     /**
