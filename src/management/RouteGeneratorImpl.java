@@ -32,7 +32,6 @@ public class RouteGeneratorImpl implements RouteGenerator {
 
     @Override
     public Route[] generateRoutes(Institution instn) {
-        this.getPerishableFoodContainers(instn);
         //todo Recolher primeiro contentores do tipo 'perishable food'
         //todo Recolher containers com capacidade > 80% (criar método que calcula a percentagem)
         //todo ter em atenção as capacidades dos veículos;

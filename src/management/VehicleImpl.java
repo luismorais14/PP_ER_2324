@@ -97,7 +97,6 @@ public class VehicleImpl implements Vehicle {
             return false;
         }
 
-        Container[] containers = this.emptyContainers[typeIndex];
         for (int i = 0; i < this.emptyContainers[typeIndex].length; i++) {
             if (this.emptyContainers[typeIndex][i] == null) {
                 this.emptyContainers[typeIndex][i] = container;
@@ -139,8 +138,7 @@ public class VehicleImpl implements Vehicle {
                         String type = TypesManagement.getTypes()[j];
                         if (capacities.get(type) != null) {
                             this.capacities[j] = ((Number) capacities.get(type)).doubleValue();
-                            int numContainers = (int) this.capacities[j];
-                            this.emptyContainers[j] = new Container[numContainers];
+                            this.emptyContainers[j] = this.createEmptyContainers(this.capacities[j], type);
                         }
                     }
                 }
@@ -152,6 +150,25 @@ public class VehicleImpl implements Vehicle {
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
+    }
+
+    /**
+     * Método responsável por criar containers vazios
+     * @param size o número de contaiers a serem criados
+     * @param type o tipo de containers a serem criados
+     * @return a coleção de containers vazios
+     */
+    private Container[] createEmptyContainers(double size, String type) {
+        int nContainers = (int) size;
+        Container[] containers = new Container[nContainers];
+        ContainerTypeImpl ct = new ContainerTypeImpl(type);
+
+        for (int i = 0; i < nContainers; i++) {
+            containers[i] = new ContainerImpl(ct, 0, "");
+            containers[i] = null;
+        }
+
+        return containers;
     }
 
     /**
@@ -184,6 +201,8 @@ public class VehicleImpl implements Vehicle {
         VehicleImpl clone = new VehicleImpl();
 
         clone.setCode(this.getCode());
+        clone.setCapacities();
+
         return clone;
     }
 
