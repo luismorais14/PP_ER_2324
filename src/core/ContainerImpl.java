@@ -184,18 +184,12 @@ public class ContainerImpl implements Container {
             return null;
         }
         Measurement[] newMeasurements = new Measurement[measurements.length];
-        try {
             for (int i = 0; i < newMeasurements.length; i++) {
                 if (measurements[i] != null) {
                     MeasurementImpl measurement1 = (MeasurementImpl) measurements[i];
-                    newMeasurements[i] = (Measurement) measurement1.clone();
+                    newMeasurements[i] = (Measurement) measurement1.getClone();
                 }
             }
-
-            } catch (CloneNotSupportedException ex) {
-                System.out.println(ex.getMessage());
-                return null;
-        }
         return newMeasurements;
     }
 
@@ -229,7 +223,15 @@ public class ContainerImpl implements Container {
         clone.setCapacity(this.getCapacity());
         clone.setCode(this.getCode());
         clone.setItemType(this.getType());
-        clone.setMeasurements(this.getMeasurements());
+
+        if (this.measurements != null) {
+            MeasurementImpl[] clonedMeasurements = new MeasurementImpl[this.measurements.getMeasurements().length];
+            for (int i = 0; i < this.measurements.getMeasurements().length; i++) {
+                MeasurementImpl measurement = (MeasurementImpl) this.measurements.getMeasurements()[i];
+                clonedMeasurements[i] = (MeasurementImpl) measurement.getClone();
+            }
+            clone.setMeasurements(clonedMeasurements);
+        }
         return clone;
     }
 

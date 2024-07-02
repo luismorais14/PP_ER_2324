@@ -311,6 +311,14 @@ public class AidBoxImpl implements AidBox {
         AidBoxImpl clone = (AidBoxImpl) super.clone();
         clone.setCode(this.getCode());
         clone.setZone(this.getZone());
+
+        ContainerImpl[] clonedContainer = new ContainerImpl[this.containerManagement.getContainers().length];
+        for (int i = 0; i < this.containerManagement.getContainers().length; i++) {
+            ContainerImpl container = (ContainerImpl) this.containerManagement.getContainers()[i];
+            clonedContainer[i] = (ContainerImpl) container.clone();
+        }
+        clone.setContainerManagement(clonedContainer);
+
         clone.setContainerManagement(this.getContainers());
         return clone;
     }

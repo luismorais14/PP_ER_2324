@@ -22,117 +22,48 @@ import core.InstitutionImpl;
 import core.TypesManagement;
 
 public class RouteGeneratorImpl implements RouteGenerator {
-    private final int ARRAY_SIZE = 0;
 
-    RouteImpl[] route = new RouteImpl[ARRAY_SIZE];
-    private AidBoxImpl[] routes;
-    private static int nRoutes = 0;
-    private int pickedContainer;
-    private int nonPickedContainer;
+    private static int nPickedContainers = 0;
 
     @Override
     public Route[] generateRoutes(Institution instn) {
-        //todo Recolher primeiro contentores do tipo 'perishable food'
-        //todo Recolher containers com capacidade > 80% (criar método que calcula a percentagem)
-        //todo ter em atenção as capacidades dos veículos;
+        this.getPerishableFoodContainers(instn);
+        //todo criar método para calcular percentagem de capacidade
+        //todo recolher o resto dos containers com capacidade > 80%
         //todo identificar veículo a utilizar em cada rota
         //todo identificar containers a transportar
         //todo indentificar containers que não estão a ser utilizados em aidboxes
         return null;
     }
 
+    /**
+     * Método responsável por recolher os containers da instituição do tipo 'perishable food'
+     * @param instn a instituição a serem recolhidos os containers
+     */
     private void getPerishableFoodContainers(Institution instn) {
-        InstitutionImpl institution = (InstitutionImpl) instn;
-        Vehicle[] vehicles = institution.getVehicles();
+        Vehicle[] vehicles = instn.getVehicles();
         ContainerType type = TypesManagement.findByType("perishable food");
-        int capacityIndex = this.findCapacityIndex(type);
+        int nParagens;
 
         for (int i = 0; i < vehicles.length; i++) { //for que percorre os veículos
             VehicleImpl vehicle = (VehicleImpl) vehicles[i];
-            for (int j = 0; j < institution.getAidBoxes().length; j++) { //for que percorre aidboxes
-                for (int k = 0; k < institution.getAidBoxes()[j].getContainers().length; k++) { //for que percorre os containers
-                    if (institution.getAidBoxes()[j].getContainers()[k].getType().equals(type)) {
-                        vehicle.pickContainer(institution.getAidBoxes()[j].getContainers()[k]);
-                    }
-                }
-            }
-        }
-
-
-    }
-
-    /**
-     * Método responsável por procurar o index da capacidade correspondente ao tipo de container
-     *
-     * @param ct    o tipo a ser procurado
-     * @return o index
-     */
-    private int findCapacityIndex(ContainerType ct) {
-        ContainerTypeImpl type = (ContainerTypeImpl) ct;
-        for (int i = 0; i < TypesManagement.getTypes().length; i++) {
-            if (TypesManagement.getTypes()[i].compareTo(type.getType()) == 0) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    public boolean routeContainsContainer(Route route, Container container) {
-        for (AidBox aidBox : route.getRoute()) {
-            if (aidBox != null) {
-                for (Container routeContainer : aidBox.getContainers()) {
-                    if (routeContainer != null && routeContainer.equals(container)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    public void calculatePickedContainers(Institution instn, Route[] routes) {
-        int pickedCount = 0;
-
-        for (AidBox aidBox : instn.getAidBoxes()) {
-            if (aidBox != null) {
-                for (Container container : aidBox.getContainers()) {
-                    if (container != null) {
-                        for (Route route : routes) {
-                            if (route != null && routeContainsContainer(route, container)) {
-                                pickedCount++;
-                                break;
-                            }
+            System.out.println("Veículo utilizado: " + vehicle.getCode());
+            nParagens = 0;
+            for (int j = 0; j < instn.getAidBoxes().length; j++) { //for que percorre aidboxes
+                for (int k = 0; k < instn.getAidBoxes()[j].getContainers().length; k++) { //for que percorre os containers
+                    if (instn.getAidBoxes()[j].getContainers()[k].getType().equals(type)) {
+                        if (vehicle.pickContainer(instn.getAidBoxes()[j].getContainers()[k])) {
+                            System.out.println("" + (nParagens + 1) + "º paragem: " + instn.getAidBoxes()[j].getCode());
+                            System.out.println("Container recolhido: " + instn.getAidBoxes()[j].getContainers()[k].getCode());
+                            instn.getAidBoxes()[j].getContainers()[k] = null;
+                            nParagens++;
+                            nPickedContainers++;
                         }
                     }
                 }
             }
+            System.out.println("\n");
         }
-
-        this.pickedContainer = pickedCount;
     }
 
-    public void calculateNonPickedContainers(Institution instn, Route[] routes) {
-        int nonPickedCount = 0;
-
-        for (AidBox aidBox : instn.getAidBoxes()) {
-            if (aidBox != null) {
-                for (Container container : aidBox.getContainers()) {
-                    if (container != null) {
-                        boolean picked = false;
-                        for (Route route : routes) {
-                            if (route != null && routeContainsContainer(route, container)) {
-                                picked = true;
-                                break;
-                            }
-                        }
-                        if (!picked) {
-                            nonPickedCount++;
-                        }
-                    }
-                }
-            }
-        }
-
-        this.nonPickedContainer = nonPickedCount;
-    }
 }

@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 
-public class MeasurementImpl implements Measurement {
+public class MeasurementImpl implements Measurement{
 
     private LocalDateTime date;
     private double measurementValue;
@@ -27,6 +27,16 @@ public class MeasurementImpl implements Measurement {
         this.date = null;
         this.measurementValue = 0.0;
     }
+
+    /**
+     * Construtor de Measurement
+     */
+    public MeasurementImpl(MeasurementImpl measurement) {
+        this.date = measurement.getDate();
+        this.measurementValue = measurement.getValue();
+    }
+
+
 
     /**
      * Construtor de Measurement
@@ -99,11 +109,7 @@ public class MeasurementImpl implements Measurement {
         return true;
     }
 
-    @Override
-    protected Object clone() throws CloneNotSupportedException {
-        MeasurementImpl clone = (MeasurementImpl) super.clone();
-        clone.setDate(this.getDate());
-        clone.setMeasurementValue(this.getValue());
-        return clone;
+    protected Object getClone() {
+        return new MeasurementImpl(this);
     }
 }
