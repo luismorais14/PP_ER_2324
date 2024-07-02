@@ -38,7 +38,7 @@ public class ReportImpl implements Report {
 
     /**
      * Construtor de Vehicle
-     * @param uVehicle o veículo associado a esta rota
+     * @param uVehicle o número de veículos utilizados
      * @param tDistance a distância total da rota
      * @param tDuration a duração total da rota
      * @param nPickedContainer o numero de contentores usados
