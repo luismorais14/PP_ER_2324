@@ -59,6 +59,17 @@ public class InstitutionImpl implements Institution {
 
     /**
      * Construtor de Institution
+     */
+    public InstitutionImpl(String name) {
+        this.InstitutionName = name;
+        this.aidboxes = new AidBoxManagement();
+        this.measurements = new MeasurementsManagement();
+        this.vehiclesManagement = new VehicleManagement();
+        this.pickingMaps = new PickingMapManagement();
+    }
+
+    /**
+     * Construtor de Institution
      *
      * @param name        o nome da instituição
      * @param pm          os mapas de picking associados à instituição

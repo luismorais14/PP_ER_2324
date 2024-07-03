@@ -35,6 +35,8 @@ public class RouteGeneratorImpl implements RouteGenerator {
     private static int nRoutes = 0;
     private Container[] pickedContainers;
     int pickedContainersIndex = 0;
+    private Vehicle[] usedVehicles;
+    int nVehiclesUsed = 0;
 
 
     @Override
@@ -61,6 +63,9 @@ public class RouteGeneratorImpl implements RouteGenerator {
 
         for (int i = 0; i < vehicles.length; i++) {
             VehicleImpl vehicle = (VehicleImpl) vehicles[i];
+            if (this.verifyIfVehicleUsed(this.usedVehicles, vehicle, this.nVehiclesUsed)) {
+                continue;
+            }
             System.out.println("Veículo utilizado: " + vehicle.getCode());
             int nParagens = 0;
             nNonPickedContainers = 0;
@@ -142,6 +147,7 @@ public class RouteGeneratorImpl implements RouteGenerator {
         int numContainers = this.getTotalContainers(instn);
         int nPerishableFoodContainers = this.getPerishableContainers(instn, type);
         AidBox[] aidboxesUsed = new AidBox[instn.getAidBoxes().length];
+        usedVehicles = new Vehicle[instn.getVehicles().length];
         int nAidBoxesUsed = 0;
         int pickingContainers = 0;
         this.pickedContainers = new Container[numContainers];
@@ -151,6 +157,8 @@ public class RouteGeneratorImpl implements RouteGenerator {
                 break;
             }
             VehicleImpl vehicle = (VehicleImpl) vehicles[i];
+            usedVehicles[i] = vehicle;
+            this.nVehiclesUsed++;
             System.out.println("Veículo utilizado: " + vehicle.getCode());
             nParagens = 0;
             this.nNonPickedContainers = 0;
@@ -244,6 +252,22 @@ public class RouteGeneratorImpl implements RouteGenerator {
             }
         }
         return count;
+    }
+
+    /**
+     * Método responsável por verificar se um veículo já foi utilizado ou não
+     * @param vehicles a coleção de veículos utiizados
+     * @param vehicle o veículo a verificar
+     * @param size o tamanho da coleção
+     * @return true caso já tenha sido utilizado, false caso contrário
+     */
+    private boolean verifyIfVehicleUsed(Vehicle[] vehicles,Vehicle vehicle, int size) {
+        for (int i = 0; i < size; i++) {
+            if (vehicles[i].equals(vehicle)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

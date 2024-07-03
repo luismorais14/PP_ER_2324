@@ -12,9 +12,7 @@ package core;
 import com.estg.core.ContainerType;
 import com.estg.core.Institution;
 import com.estg.core.Measurement;
-import com.estg.core.exceptions.AidBoxException;
-import com.estg.core.exceptions.ContainerException;
-import com.estg.core.exceptions.InstitutionException;
+import com.estg.core.exceptions.*;
 import com.estg.pickingManagement.PickingMap;
 import com.estg.pickingManagement.Vehicle;
 import io.DataHandler;
@@ -28,11 +26,12 @@ import java.time.LocalDateTime;
 
 public class PP_ER_2324 {
 
-    public static void main(String[] args) throws AidBoxException, ContainerException, IOException, InstitutionException {
+    public static void main(String[] args) throws AidBoxException, ContainerException, IOException, InstitutionException, VehicleException, PickingMapException {
         DataHandler dh = new DataHandler();
         InstitutionImpl instn = new InstitutionImpl();
         ImporterImpl importer = new ImporterImpl();
         RouteGeneratorImpl routeGen = new RouteGeneratorImpl();
+        Menus menu = new Menus(instn);
 
         dh.apiToAidBoxes();
         dh.apiToContainers();
@@ -41,10 +40,7 @@ public class PP_ER_2324 {
         dh.apiToReadings();
         dh.apiToVehicles();
 
-        importer.importData(instn);
-
-        routeGen.generateRoutes(instn);
-
+        menu.MainMenu();
 
     }
 
