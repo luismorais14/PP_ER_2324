@@ -18,6 +18,9 @@ import com.estg.pickingManagement.Report;
 import com.estg.pickingManagement.Route;
 import com.estg.pickingManagement.RouteGenerator;
 import com.estg.pickingManagement.Vehicle;
+import core.AidBoxImpl;
+import core.ContainerImpl;
+import core.ContainerTypeImpl;
 import core.TypesManagement;
 
 import java.time.LocalDateTime;
@@ -30,74 +33,101 @@ public class RouteGeneratorImpl implements RouteGenerator {
     private int nNonPickedContainers = 0;
     private Route[] routes = new Route[ARRAY_SIZE];
     private static int nRoutes = 0;
+    private Container[] pickedContainers;
+    int pickedContainersIndex = 0;
+
 
     @Override
     public Route[] generateRoutes(Institution instn) {
         try {
             this.getPerishableFoodContainers(instn);
-            this.getNonPerishableFoodContainers(instn); // Ver se esta certo
-            this.getMedicineContainers(instn); // Ver se esta certo
-            this.getClothingContainers(instn); // Ver se esta certo
+            System.out.println("---------------------------------------------------");
+            this.collectHighCapacityContainer(instn);
         } catch (AidBoxException ex) {
             System.out.println(ex.getMessage());
         }
-
-        collectHighCapacityContainer(instn); // Ver se esta certo, ta a dar erro ao chamar
-        //todo recolher o resto dos containers com capacidade > 80%
-        //todo identificar veículo a utilizar em cada rota
-        //todo identificar containers a transportar
-        //todo indentificar containers que não estão a ser utilizados em aidboxes
         return routes;
     }
 
     /**
      * Método responsável por coletar containers com capacidade superior a 80%
-     * @param instn  a instituição a serem recolhidos os containers.
+     *
+     * @param instn a instituição a serem recolhidos os containers.
      */
-    
-    private void collectHighCapacityContainer(Institution instn) throws AidBoxException { // Não sei se está certo
+    private void collectHighCapacityContainer(Institution instn) throws AidBoxException {
         Vehicle[] vehicles = instn.getVehicles();
         int numContainers = getTotalContainers(instn);
-        AidBox[] aidboxesUsed = new AidBox[instn.getAidBoxes().length];
-        int numAidBoxesUsed = 0;
-        int nParagens;
+        int numHighCapacityContainers = getNumberOfHighCapacityContainers(instn) - pickedContainersIndex;
 
-        for (Vehicle vehicle : vehicles) {
-            VehicleImpl vehicleImpl = (VehicleImpl) vehicle;
+        for (int i = 0; i < vehicles.length; i++) {
+            VehicleImpl vehicle = (VehicleImpl) vehicles[i];
             System.out.println("Veículo utilizado: " + vehicle.getCode());
-            nParagens = 0;
-            int numNonPickedContainers = 0;
-            int numPickedContainers = 0;
-            numAidBoxesUsed = 0;
-            for (AidBox aidbox : instn.getAidBoxes()) {
-                for (Container container : aidbox.getContainers()) {
-                    double capacityPercentage = calcCapacityPercentage(container);
-                    if (capacityPercentage > 80) {
-                        if (vehicleImpl.pickContainer(container)) {
-                            aidboxesUsed[numAidBoxesUsed] = aidbox;
-                            numAidBoxesUsed++;
-                            System.out.println(" º paragem: " + (nParagens + 1) + aidbox.getCode());
-                            System.out.println("Container apanhado:" + container.getCode());
-                            aidbox.removeContainer(container);
-                            nParagens++;
-                            numPickedContainers++;
+            int nParagens = 0;
+            nNonPickedContainers = 0;
+            nPickedContainers = 0;
+
+            AidBox[] currentlyUsedAidboxes = new AidBox[instn.getAidBoxes().length];
+            int nCurrentlyUsedAidboxes = 0;
+            boolean foundHighCapacityContainer = false;
+
+            for (int j = 0; j < instn.getAidBoxes().length; j++) {
+                AidBoxImpl aidBox = (AidBoxImpl) instn.getAidBoxes()[j];
+                Container[] containers = aidBox.getContainers();
+
+                if (containsNotPickedContainers(aidBox, pickedContainersIndex)) {
+                    if (checkAidBoxContaiersCapacity(aidBox)) {
+                        for (int k = 0; k < containers.length; k++) {
+                            if (calcCapacityPercentage(containers[k]) > 80) {
+                                if (!verifyPickedContainer(containers[k], pickedContainersIndex)) {
+                                    if (vehicle.pickContainer(containers[k])) {
+                                        System.out.println("" + (nParagens + 1) + "º paragem: " + aidBox.getCode());
+                                        System.out.println("Container recolhido: " + containers[k].getCode());
+                                        nPickedContainers++;
+                                        foundHighCapacityContainer = true;
+                                        currentlyUsedAidboxes[nCurrentlyUsedAidboxes] = aidBox;
+                                        nCurrentlyUsedAidboxes++;
+                                        nParagens++;
+                                        if (nPickedContainers == numHighCapacityContainers) {
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
-
                 }
 
+                if (nPickedContainers == numHighCapacityContainers) {
+                    break;
+                }
             }
-            numNonPickedContainers = numContainers - numPickedContainers;
-            double totalDistance = this.calcTotalDistance(aidboxesUsed, numAidBoxesUsed);
-            double totalDuration = this.calcTotalDuration(aidboxesUsed, numAidBoxesUsed);
-            System.out.println("");
 
-            ReportImpl report = new ReportImpl(1, this.nPickedContainers, totalDistance, totalDuration, this.nNonPickedContainers, instn.getVehicles().length - 1, LocalDateTime.now());
+            if (!foundHighCapacityContainer) {
+                System.out.println("Nenhuma aidbox encontrada com containers com lotação superior a 80% para o veículo");
+            }
+
+            nNonPickedContainers = numContainers - nPickedContainers;
+
+            double totalDistance = calcTotalDistance(currentlyUsedAidboxes, nCurrentlyUsedAidboxes);
+            double totalDuration = calcTotalDuration(currentlyUsedAidboxes, nCurrentlyUsedAidboxes);
+
+            System.out.println("\n");
+            ReportImpl report = new ReportImpl(1, nPickedContainers, totalDistance, totalDuration, nNonPickedContainers, instn.getVehicles().length - 1, LocalDateTime.now());
             RouteImpl route = new RouteImpl(vehicle, report);
-            route.setAidBox(aidboxesUsed);
-        }
+            route.setAidBox(currentlyUsedAidboxes);
+            nRoutes++;
+            if (nRoutes - 1 == this.routes.length) {
+                this.expandRoutesArray();
+            }
+            this.routes[nRoutes - 1] = route;
 
+            if (nPickedContainers == numHighCapacityContainers) {
+                break;
+            }
+        }
     }
+
+
 
     /**
      * Método responsável por recolher os containers da instituição do tipo
@@ -110,197 +140,71 @@ public class RouteGeneratorImpl implements RouteGenerator {
         ContainerType type = TypesManagement.findByType("perishable food");
         int nParagens;
         int numContainers = this.getTotalContainers(instn);
+        int nPerishableFoodContainers = this.getPerishableContainers(instn, type);
         AidBox[] aidboxesUsed = new AidBox[instn.getAidBoxes().length];
         int nAidBoxesUsed = 0;
+        int pickingContainers = 0;
+        this.pickedContainers = new Container[numContainers];
 
-        for (int i = 0; i < vehicles.length; i++) { //for que percorre os veículos
+        for (int i = 0; i < vehicles.length; i++) { // for que percorre os veículos
+            if (pickingContainers == nPerishableFoodContainers) {
+                break;
+            }
             VehicleImpl vehicle = (VehicleImpl) vehicles[i];
             System.out.println("Veículo utilizado: " + vehicle.getCode());
             nParagens = 0;
             this.nNonPickedContainers = 0;
             this.nPickedContainers = 0;
-            nAidBoxesUsed = 0;
-            for (int j = 0; j < instn.getAidBoxes().length; j++) { //for que percorre aidboxes
-                for (int k = 0; k < instn.getAidBoxes()[j].getContainers().length; k++) { //for que percorre os containers
-                    if (instn.getAidBoxes()[j].getContainers()[k].getType().equals(type)) {
-                        if (vehicle.pickContainer(instn.getAidBoxes()[j].getContainers()[k])) {
-                            aidboxesUsed[nAidBoxesUsed] = instn.getAidBoxes()[j];
-                            nAidBoxesUsed++;
-                            System.out.println("" + (nParagens + 1) + "º paragem: " + instn.getAidBoxes()[j].getCode());
-                            System.out.println("Container recolhido: " + instn.getAidBoxes()[j].getContainers()[k].getCode());
-                            instn.getAidBoxes()[j].getContainers()[k] = null;
-                            nParagens++;
-                            this.nPickedContainers++;
+            AidBox[] currentlyUsedAidboxes = new AidBox[aidboxesUsed.length];
+            int nCurrentlyUsedAidboxes = 0;
+            int totalPickedContainers = 0;
+
+            for (int j = 0; j < instn.getAidBoxes().length; j++) { // for que percorre aidboxes
+                AidBoxImpl aidBox = (AidBoxImpl) instn.getAidBoxes()[j];
+                if (j > 0 && nAidBoxesUsed > 0) {
+                    if (this.verifyAidBoxUsage(aidboxesUsed, aidBox, nAidBoxesUsed)) {
+                        continue;
+                    }
+                }
+                Container[] containers = aidBox.getContainers();
+                if (this.verifyPerishableFoodContainer(aidBox)) {
+                    aidboxesUsed[nAidBoxesUsed] = aidBox;
+                    currentlyUsedAidboxes[nCurrentlyUsedAidboxes] = aidBox;
+                    System.out.println("" + (nParagens + 1) + "º paragem: " + aidBox.getCode());
+                    for (int k = 0; k < containers.length && totalPickedContainers < vehicle.getCapacity(type); k++) { // for que percorre os containers
+                        if (containers[k].getType().equals(type)) {
+                            if (vehicle.pickContainer(containers[k])) {
+                                System.out.println("Container recolhido: " + containers[k].getCode());
+                                this.pickedContainers[this.pickedContainersIndex] = containers[k];
+                                this.nPickedContainers++;
+                                this.pickedContainersIndex++;
+                            }
+                            pickingContainers++;
+                        } else if (this.calcCapacityPercentage(containers[k]) > 80) {
+                            if (vehicle.pickContainer(containers[k])) {
+                                System.out.println("Container recolhido: " + containers[k].getCode());
+                                this.pickedContainers[this.pickedContainersIndex] = containers[k];
+                                this.nPickedContainers++;
+                                this.pickedContainersIndex++;
+                            }
                         }
                     }
+                    totalPickedContainers++;
+                    nCurrentlyUsedAidboxes++;
+                    nParagens++;
+                    nAidBoxesUsed++;
+                }
+                if (totalPickedContainers == vehicle.getCapacity(type)) {
+                    break;
                 }
             }
             this.nNonPickedContainers = numContainers - this.nPickedContainers;
-            double totalDistance = this.calcTotalDistance(aidboxesUsed, nAidBoxesUsed);
-            double totalDuration = this.calcTotalDuration(aidboxesUsed, nAidBoxesUsed);
+            double totalDistance = this.calcTotalDistance(currentlyUsedAidboxes, nCurrentlyUsedAidboxes);
+            double totalDuration = this.calcTotalDuration(currentlyUsedAidboxes, nCurrentlyUsedAidboxes);
             System.out.println("\n");
             ReportImpl report = new ReportImpl(1, this.nPickedContainers, totalDistance, totalDuration, this.nNonPickedContainers, instn.getVehicles().length - 1, LocalDateTime.now());
             RouteImpl route = new RouteImpl(vehicle, report);
-            route.setAidBox(aidboxesUsed);
-            nRoutes++;
-            if (nRoutes - 1 == this.routes.length) {
-                this.expandRoutesArray();
-            }
-            this.routes[nRoutes - 1] = route;
-        }
-    }
-
-    /**
-     * Método responsável por recolher os containers da instituição do tipo 'non
-     * perishable food'.
-     *
-     * @param instn a instituição a serem recolhidos os containers.
-     */
-    private void getNonPerishableFoodContainers(Institution instn) throws AidBoxException {
-        Vehicle[] vehicles = instn.getVehicles();
-        ContainerType type = TypesManagement.findByType("non perishable food");
-        int nParagens;
-        int numContainers = this.getTotalContainers(instn);
-        AidBox[] aidboxesUsed = new AidBox[instn.getAidBoxes().length];
-        int nAidBoxesUsed = 0;
-
-        for (int i = 0; i < vehicles.length; i++) {
-            VehicleImpl vehicle = (VehicleImpl) vehicles[i];
-            System.out.println("Veículo utilizado: " + vehicle.getCode());
-            nParagens = 0;
-            this.nNonPickedContainers = 0;
-            this.nPickedContainers = 0;
-            nAidBoxesUsed = 0;
-            for (int j = 0; i < instn.getAidBoxes().length; j++) {
-                for (int k = 0; k < instn.getAidBoxes()[j].getContainers().length; k++) {
-                    if (instn.getAidBoxes()[j].getContainers()[k].getType().equals(type)) {
-                        if (vehicle.pickContainer(instn.getAidBoxes()[j].getContainers()[k])) {
-                            aidboxesUsed[nAidBoxesUsed] = instn.getAidBoxes()[j];
-                            nAidBoxesUsed++;
-                            System.out.println("" + (nParagens + 1) + "º paragem: " + instn.getAidBoxes()[j].getCode());
-                            System.out.println("Container recolhido: " + instn.getAidBoxes()[j].getContainers()[k].getCode());
-                            instn.getAidBoxes()[j].getContainers()[k] = null;
-                            nParagens++;
-                            this.nPickedContainers++;
-                        }
-                    }
-                }
-
-            }
-
-            this.nNonPickedContainers = numContainers - this.nPickedContainers;
-            double totalDistance = this.calcTotalDistance(aidboxesUsed, nAidBoxesUsed);
-            double totalDuration = this.calcTotalDuration(aidboxesUsed, nAidBoxesUsed);
-            System.out.println("\n");
-            ReportImpl report = new ReportImpl(1, this.nPickedContainers, totalDistance, totalDuration, this.nNonPickedContainers, instn.getVehicles().length - 1, LocalDateTime.now());
-            RouteImpl route = new RouteImpl(vehicle, report);
-            route.setAidBox(aidboxesUsed);
-            nRoutes++;
-            if (nRoutes - 1 == this.routes.length) {
-                this.expandRoutesArray();
-            }
-            this.routes[nRoutes - 1] = route;
-        }
-    }
-
-    /**
-     * Método responsável por recolher os containers da instituição do tipo
-     * 'clothing'.
-     *
-     * @param instn a instituição a serem recolhidos os containers.
-     */
-    private void getClothingContainers(Institution instn) throws AidBoxException {
-        Vehicle[] vehicles = instn.getVehicles();
-        ContainerType type = TypesManagement.findByType("clothing");
-        int nParagens;
-        int numContainers = this.getTotalContainers(instn);
-        AidBox[] aidboxesUsed = new AidBox[instn.getAidBoxes().length];
-        int nAidBoxesUsed = 0;
-
-        for (int i = 0; i < vehicles.length; i++) {
-            VehicleImpl vehicle = (VehicleImpl) vehicles[i];
-            System.out.println("Veículo utilizado: " + vehicle.getCode());
-            nParagens = 0;
-            this.nNonPickedContainers = 0;
-            this.nPickedContainers = 0;
-            nAidBoxesUsed = 0;
-            for (int j = 0; i < instn.getAidBoxes().length; j++) {
-                for (int k = 0; k < instn.getAidBoxes()[j].getContainers().length; k++) {
-                    if (instn.getAidBoxes()[j].getContainers()[k].getType().equals(type)) {
-                        if (vehicle.pickContainer(instn.getAidBoxes()[j].getContainers()[k])) {
-                            aidboxesUsed[nAidBoxesUsed] = instn.getAidBoxes()[j];
-                            nAidBoxesUsed++;
-                            System.out.println("" + (nParagens + 1) + "º paragem: " + instn.getAidBoxes()[j].getCode());
-                            System.out.println("Container recolhido: " + instn.getAidBoxes()[j].getContainers()[k].getCode());
-                            instn.getAidBoxes()[j].getContainers()[k] = null;
-                            nParagens++;
-                            this.nPickedContainers++;
-                        }
-                    }
-                }
-
-            }
-
-            this.nNonPickedContainers = numContainers - this.nPickedContainers;
-            double totalDistance = this.calcTotalDistance(aidboxesUsed, nAidBoxesUsed);
-            double totalDuration = this.calcTotalDuration(aidboxesUsed, nAidBoxesUsed);
-            System.out.println("\n");
-            ReportImpl report = new ReportImpl(1, this.nPickedContainers, totalDistance, totalDuration, this.nNonPickedContainers, instn.getVehicles().length - 1, LocalDateTime.now());
-            RouteImpl route = new RouteImpl(vehicle, report);
-            route.setAidBox(aidboxesUsed);
-            nRoutes++;
-            if (nRoutes - 1 == this.routes.length) {
-                this.expandRoutesArray();
-            }
-            this.routes[nRoutes - 1] = route;
-        }
-    }
-
-    /**
-     * Método responsável por recolher os containers da instituição do tipo
-     * 'medicine'.
-     *
-     * @param instn a instituição a serem recolhidos os containers.
-     */
-    private void getMedicineContainers(Institution instn) throws AidBoxException {
-        Vehicle[] vehicles = instn.getVehicles();
-        ContainerType type = TypesManagement.findByType("medicine");
-        int nParagens;
-        int numContainers = this.getTotalContainers(instn);
-        AidBox[] aidboxesUsed = new AidBox[instn.getAidBoxes().length];
-        int nAidBoxesUsed = 0;
-
-        for (int i = 0; i < vehicles.length; i++) {
-            VehicleImpl vehicle = (VehicleImpl) vehicles[i];
-            System.out.println("Veículo utilizado: " + vehicle.getCode());
-            nParagens = 0;
-            this.nNonPickedContainers = 0;
-            this.nPickedContainers = 0;
-            nAidBoxesUsed = 0;
-            for (int j = 0; i < instn.getAidBoxes().length; j++) {
-                for (int k = 0; k < instn.getAidBoxes()[j].getContainers().length; k++) {
-                    if (instn.getAidBoxes()[j].getContainers()[k].getType().equals(type)) {
-                        if (vehicle.pickContainer(instn.getAidBoxes()[j].getContainers()[k])) {
-                            aidboxesUsed[nAidBoxesUsed] = instn.getAidBoxes()[j];
-                            nAidBoxesUsed++;
-                            System.out.println("" + (nParagens + 1) + "º paragem: " + instn.getAidBoxes()[j].getCode());
-                            System.out.println("Container recolhido: " + instn.getAidBoxes()[j].getContainers()[k].getCode());
-                            instn.getAidBoxes()[j].getContainers()[k] = null;
-                            nParagens++;
-                            this.nPickedContainers++;
-                        }
-                    }
-                }
-
-            }
-
-            this.nNonPickedContainers = numContainers - this.nPickedContainers;
-            double totalDistance = this.calcTotalDistance(aidboxesUsed, nAidBoxesUsed);
-            double totalDuration = this.calcTotalDuration(aidboxesUsed, nAidBoxesUsed);
-            System.out.println("\n");
-            ReportImpl report = new ReportImpl(1, this.nPickedContainers, totalDistance, totalDuration, this.nNonPickedContainers, instn.getVehicles().length - 1, LocalDateTime.now());
-            RouteImpl route = new RouteImpl(vehicle, report);
-            route.setAidBox(aidboxesUsed);
+            route.setAidBox(currentlyUsedAidboxes);
             nRoutes++;
             if (nRoutes - 1 == this.routes.length) {
                 this.expandRoutesArray();
@@ -325,12 +229,100 @@ public class RouteGeneratorImpl implements RouteGenerator {
     }
 
     /**
+     * Método responsável por retornar a quantidade de containers com lotação superior a 80%
+     *
+     * @param instn instituição a verificar os containers
+     * @return o número de containers
+     */
+    private int getNumberOfHighCapacityContainers(Institution instn) {
+        int count = 0;
+        for (AidBox aidBox : instn.getAidBoxes()) {
+            for (Container container : aidBox.getContainers()) {
+                if (container != null && this.calcCapacityPercentage(container) > 80) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    /**
+     * Método responsável por verificar se a aidbox possui containers com lotação superior a 80%
+     *
+     * @param aidBox aidbox a verificar
+     * @return true se possuir, false caso contrário
+     */
+    private boolean checkAidBoxContaiersCapacity(AidBox aidBox) {
+        for (int i = 0; i < aidBox.getContainers().length; i++) {
+            if (this.calcCapacityPercentage(aidBox.getContainers()[i]) > 80) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Método responsável por verificar se uma aidbox possui containers por recolher
+     *
+     * @param aidbox aidbox a verificar
+     * @return true caso tenha containers a verificar, false caso contrário
+     */
+    private boolean containsNotPickedContainers(AidBox aidbox, int size) {
+        int counter = 0;
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < aidbox.getContainers().length; j++) {
+                if (this.pickedContainers[i].equals(aidbox.getContainers()[j])) {
+                    counter++;
+                }
+            }
+        }
+        if (counter == aidbox.getContainers().length) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Método responsável por verificar se um container já foi recolhido ou não
+     *
+     * @param cntnr o container a verificar
+     * @return true caso já tenha sido recolhido, false caso contrário
+     */
+    private boolean verifyPickedContainer(Container cntnr, int size) {
+        for (int i = 0; i < size; i++) {
+            if (this.pickedContainers[i].equals(cntnr)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Método responsável por retornar a quantidade total de containres do tipo perishable food
+     *
+     * @param instn instituição a procurar
+     * @param type  o tipo de container
+     * @return o número de containers
+     */
+    private int getPerishableContainers(Institution instn, ContainerType type) {
+        int count = 0;
+        for (AidBox aidBox : instn.getAidBoxes()) {
+            for (Container container : aidBox.getContainers()) {
+                if (container != null && container.getType().equals(type)) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    /**
      * Método responsável por calcular a duração total de uma rota
      *
      * @param aidboxes as aidboxes a calcular a duração
      * @return a duração total da rota
      * @throws AidBoxException exceção a ser lançada caso a aidbox a calcular a
-     * duração seja null
+     *                         duração seja null
      */
     private double calcTotalDuration(AidBox[] aidboxes, int size) throws AidBoxException {
         double totalDuration = 0.0;
@@ -346,7 +338,7 @@ public class RouteGeneratorImpl implements RouteGenerator {
      * @param aidboxes as aidboxes a calcular a distância
      * @return a distância total da rota
      * @throws AidBoxException exceção a ser lançada caso a aidbox a calcular a
-     * distância seja null
+     *                         distância seja null
      */
     private double calcTotalDistance(AidBox[] aidboxes, int size) throws AidBoxException {
         double totalDistance = 0.0;
@@ -377,11 +369,44 @@ public class RouteGeneratorImpl implements RouteGenerator {
     private double calcCapacityPercentage(Container container) {
         double percentage = 0.0;
         double totalCapacity = container.getCapacity();
-        double momentCapacity = container.getMeasurements()[container.getMeasurements().length].getValue();
+        double momentCapacity = container.getMeasurements()[container.getMeasurements().length - 1].getValue();
 
         percentage = (momentCapacity / totalCapacity) * 100;
 
         return percentage;
+    }
+
+    /**
+     * Método responsável por verificar se uma aidbox já foi usada
+     *
+     * @param aidBoxes a coleção de aidboxes já utilziadas
+     * @param aidBox   a aidbox a verificar
+     * @return o sucesso ou insucesso da operação
+     */
+    private boolean verifyAidBoxUsage(AidBox[] aidBoxes, AidBox aidBox, int size) {
+        for (int i = 0; i < size; i++) {
+            if (aidBoxes[i].equals(aidBox)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Método responsável por verificar se uma aidbox possui um container do tipo Perishable Food
+     *
+     * @param aidbox aidbox a verificar
+     * @return true se possuir, false caso contrário
+     */
+    private boolean verifyPerishableFoodContainer(AidBox aidbox) {
+        ContainerType type = TypesManagement.findByType("perishable food");
+
+        for (int i = 0; i < aidbox.getContainers().length; i++) {
+            if (aidbox.getContainers()[i].getType().equals(type)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

@@ -40,6 +40,7 @@ public class AidBoxImpl implements AidBox {
         this.code = null;
         this.zone = null;
         this.containerManagement = new ContainerManagement();
+
     }
 
     /**
