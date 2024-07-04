@@ -43,7 +43,11 @@ public class Menus {
     RouteGenerator rg;
     ReportImpl rp;
 
-    public Menus(InstitutionImpl instn) { // Ver se esta correto
+    /**
+     * Método construtor de Menus
+     * @param instn a instituição do programa
+     */
+    public Menus(InstitutionImpl instn) {
         this.institution = instn;
         this.aidbox = new AidBoxImpl();
         this.container = new ContainerImpl();
@@ -55,7 +59,13 @@ public class Menus {
 
     }
 
-    public void MainMenu() throws AidBoxException, ContainerException, VehicleException, PickingMapException {
+    /**
+     * Método responsável por exibir o menu principal e as suas funcionalidades
+     * @throws AidBoxException exceção a ser lançada caso alguma aidbox da instituição seja null
+     * @throws ContainerException exceção a ser lançada caso algum container da instituição seja null
+     * @throws VehicleException exceção a ser lançada caso algum veículo da instituição seja null
+     */
+    public void MainMenu() throws AidBoxException, ContainerException, VehicleException{
         Scanner input = new Scanner(System.in);
         boolean aux = false;
         int inputNum = 0;
@@ -125,10 +135,9 @@ public class Menus {
     }
 
     /**
-     * Método responsável por exibir o menu de gerenciamento de aidboxes e
-     * gerencia as operações relacionadas a aidboxes.
+     * Método responsável por exibir o menu de gerir aidboxes
      *
-     * @throws AidBoxException se ocorrer um erro relacionado aos aidboxes.
+     * @throws AidBoxException exceção a ser lançada caso ocorra um erro relacionado aos aidboxes.
      */
     private void ManageAidboxesMenu() throws AidBoxException, ContainerException {
         Scanner input = new Scanner(System.in);
@@ -293,6 +302,10 @@ public class Menus {
     }
 
 
+    /**
+     * Método responsável por exibir o menu de veículos
+     * @throws VehicleException exceção a ser lançada caso ocorra um erro com os veículos
+     */
     private void ManageVehiclesMenu() throws VehicleException {
         Scanner input = new Scanner(System.in);
         boolean aux = false;
@@ -366,6 +379,10 @@ public class Menus {
 
     }
 
+    /**
+     * Método responsável por chamar a função que gere as rotas
+     * @param instn instituição a gerar rotas
+     */
     private void generateRoutesMenu(Institution instn) {
         this.rg.generateRoutes(instn);
     }
