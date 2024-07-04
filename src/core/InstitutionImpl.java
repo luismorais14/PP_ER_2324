@@ -58,6 +58,7 @@ public class InstitutionImpl implements Institution {
 
     /**
      * Construtor de Institution
+     * @param name nome da instituição
      */
     public InstitutionImpl(String name) {
         this.InstitutionName = name;

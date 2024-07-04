@@ -30,6 +30,7 @@ public class MeasurementImpl implements Measurement{
 
     /**
      * Construtor de Measurement
+     * @param measurement medição
      */
     public MeasurementImpl(MeasurementImpl measurement) {
         this.date = measurement.getDate();

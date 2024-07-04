@@ -82,7 +82,7 @@ public class MeasurementsManagement {
      * Método responsável por remover uma medição da coleção de medições
      *
      * @param measurement a medição a ser removida
-     * @return o sucesso ou insucesso da operação
+     * @throws MeasurementException exceção a ser lançada caso a measurement recebida como parametro seja null
      */
     public void removeMeasurement(Measurement measurement) throws MeasurementException {
         int index = findMeasurement(measurement);

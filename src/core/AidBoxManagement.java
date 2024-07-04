@@ -168,6 +168,7 @@ public class AidBoxManagement {
      * Verifica a compatibilidade de uma `AidBox` com o veículo da rota.
      *
      * @param aidbox a `AidBox` cuja compatibilidade deve ser verificada
+     * @param vhcl o veículo a verificar a compatibilidade
      * @return true se a `AidBox` for compatível com o veículo da rota, caso contrário, false
      */
     public boolean verifyCompatibility(AidBox aidbox, Vehicle vhcl) {
