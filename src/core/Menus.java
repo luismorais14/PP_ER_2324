@@ -46,6 +46,7 @@ public class Menus {
 
     /**
      * Método construtor de Menus
+     *
      * @param instn a instituição do programa
      */
     public Menus(InstitutionImpl instn) {
@@ -61,11 +62,15 @@ public class Menus {
 
     /**
      * Método responsável por exibir o menu principal e as suas funcionalidades
-     * @throws AidBoxException exceção a ser lançada caso alguma aidbox da instituição seja null
-     * @throws ContainerException exceção a ser lançada caso algum container da instituição seja null
-     * @throws VehicleException exceção a ser lançada caso algum veículo da instituição seja null
+     *
+     * @throws AidBoxException exceção a ser lançada caso alguma aidbox da
+     * instituição seja null
+     * @throws ContainerException exceção a ser lançada caso algum container da
+     * instituição seja null
+     * @throws VehicleException exceção a ser lançada caso algum veículo da
+     * instituição seja null
      */
-    public void MainMenu() throws AidBoxException, ContainerException, VehicleException{
+    public void MainMenu() throws AidBoxException, ContainerException, VehicleException {
         Scanner input = new Scanner(System.in);
         boolean aux = false;
         int inputNum = 0;
@@ -136,10 +141,16 @@ public class Menus {
             this.importer.importData(this.institution);
         } catch (FileNotFoundException ex) {
             System.out.println(ex.getMessage());
+            this.alertSystem = new AlertSystem(ex, ex.getMessage());
+            this.alertSystem.logCreater();
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
+            this.alertSystem = new AlertSystem(ex, ex.getMessage());
+            this.alertSystem.logCreater();
         } catch (InstitutionException ex) {
             System.out.println(ex.getMessage());
+            this.alertSystem = new AlertSystem(ex, ex.getMessage());
+            this.alertSystem.logCreater();
         }
         System.out.println("Data Imported Successfully!");
     }
@@ -147,7 +158,8 @@ public class Menus {
     /**
      * Método responsável por exibir o menu de gerir aidboxes
      *
-     * @throws AidBoxException exceção a ser lançada caso ocorra um erro relacionado aos aidboxes.
+     * @throws AidBoxException exceção a ser lançada caso ocorra um erro
+     * relacionado aos aidboxes.
      */
     private void ManageAidboxesMenu() throws AidBoxException, ContainerException {
         Scanner input = new Scanner(System.in);
@@ -174,6 +186,8 @@ public class Menus {
                 aux = true;
             } catch (InputMismatchException ex) {
                 System.out.println("Opção Inválida");
+                this.alertSystem = new AlertSystem(inputNum, "Opção Inválida");
+                this.alertSystem.logCreater();
                 lixo = input.nextLine(); //limpa o buffer
             }
             switch (inputNum) {
@@ -207,6 +221,8 @@ public class Menus {
                         zone = input.next();
                     } catch (InputMismatchException ex) {
                         System.out.println("Invalid character.");
+                        this.alertSystem = new AlertSystem(zone, "Invalid character.");
+                        this.alertSystem.logCreater();
                         lixo = input.nextLine(); //clear buffer
                     }
                     aidbox = new AidBoxImpl(aidcode, zone);
@@ -222,8 +238,9 @@ public class Menus {
 
                     while (aidboxExists) {
                         System.out.println("Enter the AidBox Code: ");
+                        String aidboxCode = "";
                         try {
-                            String aidboxCode = input.next();
+                            aidboxCode = input.next();
                             aidboxExists = false;
                             for (int i = 0; i < institution.getAidBoxes().length; i++) {
                                 if (institution.getAidBoxes()[i] != null && institution.getAidBoxes()[i].getCode().compareTo(aidboxCode) == 0) {
@@ -236,7 +253,9 @@ public class Menus {
                                             typeChoice = input.nextInt();
                                         } catch (InputMismatchException ex) {
                                             System.out.println("Invalid character.");
-                                            input.nextLine(); //clear buffer
+                                            this.alertSystem = new AlertSystem(typeChoice, "Invalid character.");
+                                            this.alertSystem.logCreater();
+                                            lixo = input.nextLine(); //clear buffer
                                         }
                                     }
                                     ct = TypesManagement.getContainerTypes()[typeChoice];
@@ -246,7 +265,9 @@ public class Menus {
                                         containerCapacity = input.nextInt();
                                     } catch (InputMismatchException ex) {
                                         System.out.println("Invalid number.");
-                                        input.nextLine(); //clear buffer
+                                        this.alertSystem = new AlertSystem(containerCapacity, "Invalid number.");
+                                        this.alertSystem.logCreater();
+                                        lixo = input.nextLine(); //clear buffer
                                     }
 
                                     System.out.println("Enter the container Code: ");
@@ -267,7 +288,9 @@ public class Menus {
                                         }
                                     } catch (InputMismatchException ex) {
                                         System.out.println("Invalid character.");
-                                        input.nextLine(); //clear buffer
+                                        this.alertSystem = new AlertSystem(containerCode, "Invalid character.");
+                                        this.alertSystem.logCreater();
+                                        lixo = input.nextLine(); //clear buffer
                                         codeValid = true;
                                     }
 
@@ -280,6 +303,8 @@ public class Menus {
                                                 } catch (ContainerException ex) {
                                                     System.out.println("Error while add container.");
                                                     System.out.println(ex.getMessage());
+                                                    this.alertSystem = new AlertSystem(institution.getAidBoxes()[i].getCode(), "Error while add container.");
+                                                    this.alertSystem.logCreater();
                                                 }
                                                 break;
                                             }
@@ -291,7 +316,9 @@ public class Menus {
                             }
                         } catch (InputMismatchException ex) {
                             System.out.println("Invalid character.");
-                            input.nextLine(); //clear buffer
+                            this.alertSystem = new AlertSystem(aidboxCode, "Invalid character.");
+                            this.alertSystem.logCreater();
+                            lixo = input.nextLine(); //clear buffer
                             aidboxExists = true;
                         }
                     }
@@ -318,10 +345,11 @@ public class Menus {
 
     }
 
-
     /**
      * Método responsável por exibir o menu de veículos
-     * @throws VehicleException exceção a ser lançada caso ocorra um erro com os veículos
+     *
+     * @throws VehicleException exceção a ser lançada caso ocorra um erro com os
+     * veículos
      */
     private void ManageVehiclesMenu() throws VehicleException {
         Scanner input = new Scanner(System.in);
@@ -348,6 +376,8 @@ public class Menus {
                 aux = true;
             } catch (InputMismatchException ex) {
                 System.out.println("Opção Inválida");
+                this.alertSystem = new AlertSystem(inputNum, "Opção Inválida");
+                this.alertSystem.logCreater();
                 lixo = input.nextLine(); //limpar o buffer
             }
             switch (inputNum) {
@@ -363,7 +393,9 @@ public class Menus {
                         option = input.nextInt();
                     } catch (InputMismatchException ex) {
                         System.out.println("Invalid character.");
-                        input.nextLine(); //clear buffer
+                        this.alertSystem = new AlertSystem(option, "Opção Inválida");
+                        this.alertSystem.logCreater();
+                        lixo = input.nextLine(); //clear buffer
                     }
                     institution.enableVehicle(institution.getVehicles()[option]);
                     System.out.println("Vehicle successfully enabled!");
@@ -380,7 +412,9 @@ public class Menus {
                         option = input.nextInt();
                     } catch (InputMismatchException ex) {
                         System.out.println("Invalid character.");
-                        input.nextLine(); //clear buffer
+                        this.alertSystem = new AlertSystem(option, "Opção Inválida");
+                        this.alertSystem.logCreater();
+                        lixo = input.nextLine(); //clear buffer
                     }
                     institution.disableVehicle(institution.getVehicles()[option]);
                     System.out.println("Vehicle successfully Disabled!");
@@ -411,17 +445,18 @@ public class Menus {
             fr.close();
         } catch (IOException e) {
             System.out.println("There are no alerts.");
+            this.alertSystem = new AlertSystem(e, e.getMessage());
+            this.alertSystem.logCreater();
         }
     }
 
     /**
      * Método responsável por chamar a função que gere as rotas
+     *
      * @param instn instituição a gerar rotas
      */
     private void generateRoutesMenu(Institution instn) {
         this.rg.generateRoutes(instn);
     }
 
-
 }
-
