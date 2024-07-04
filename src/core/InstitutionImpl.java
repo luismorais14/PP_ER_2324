@@ -464,6 +464,8 @@ public class InstitutionImpl implements Institution {
      * Método responsável por recolher um container
      * @param vhcl veículo
      * @param cntnr container a recolher
+     * @param aidbox aidbox
+     * @return o sucesso ou insucesso da operação
      */
     public boolean pickContainer(Vehicle vhcl, Container cntnr, AidBox aidbox) {
         for (int i = 0; i < this.vehiclesManagement.getVehicles().length; i++) {

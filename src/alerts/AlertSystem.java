@@ -30,6 +30,7 @@ public class AlertSystem {
      * Construtor de AlertSystem
      *
      * @param invalidObject o objeto inválido
+     * @param description descrição do alerta
      */
     public AlertSystem(Object invalidObject, String description) {
         this.time = LocalDateTime.now();

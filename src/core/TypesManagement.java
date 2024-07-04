@@ -26,6 +26,7 @@ public class TypesManagement {
 
     private static String[] types = new String[ARRAY_SIZE];
     private static ContainerType[] containerTypes = new ContainerType[ARRAY_SIZE];
+    private static int nTypes = 0;
     private static AlertSystem alertSystem = new AlertSystem();
 
     /**
@@ -45,6 +46,14 @@ public class TypesManagement {
     }
 
     /**
+     * Método responsável por retornar a quantidade de tipos de containers existentes
+     * @return a quantidade de containers existentes
+     */
+    public static int getnTypes() {
+        return nTypes;
+    }
+
+    /**
      * Método responsável por atualizar os tipos de containers
      */
     public static void setContainerTypes() {
@@ -59,6 +68,7 @@ public class TypesManagement {
             for (int i = 0; i < typesArray.size() && i < ARRAY_SIZE; i++) {
                 types[i] = (String) typesArray.get(i);
                 containerTypes[i] = new ContainerTypeImpl((String) typesArray.get(i));
+                nTypes++;
             }
         } catch (ParseException ex) {
             System.out.println(ex.getMessage());

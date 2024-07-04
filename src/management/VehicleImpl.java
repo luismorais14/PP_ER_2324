@@ -75,6 +75,7 @@ public class VehicleImpl implements Vehicle {
      * Método responsável por recolher um container
      *
      * @param container container a ser recolhido
+     * @param aidbox aidbox
      * @return o sucesso ou insucesso da operação
      */
     public boolean pickContainer(Container container, AidBox aidbox) {

@@ -63,12 +63,9 @@ public class Menus {
     /**
      * Método responsável por exibir o menu principal e as suas funcionalidades
      *
-     * @throws AidBoxException exceção a ser lançada caso alguma aidbox da
-     * instituição seja null
-     * @throws ContainerException exceção a ser lançada caso algum container da
-     * instituição seja null
-     * @throws VehicleException exceção a ser lançada caso algum veículo da
-     * instituição seja null
+     * @throws AidBoxException exceção a ser lançada caso alguma aidbox da instituição seja null
+     * @throws ContainerException exceção a ser lançada caso algum container da instituição seja null
+     * @throws VehicleException exceção a ser lançada caso algum veículo da instituição seja null
      */
     public void MainMenu() throws AidBoxException, ContainerException, VehicleException {
         Scanner input = new Scanner(System.in);
@@ -132,8 +129,7 @@ public class Menus {
     }
 
     /**
-     * Método responsável por exibir o menu de importação de dados e gerência a
-     * importação de dados para a instituição
+     * Método responsável por exibir o menu de importação de dados e gerência a importação de dados para a instituição
      *
      */
     private void ImportDataMenu() {
@@ -156,8 +152,7 @@ public class Menus {
     }
 
     /**
-     * Método responsável por exibir o menu de gerir aidboxes
-     * relacionado aos aidboxes.
+     * Método responsável por exibir o menu de gerir aidboxes relacionado aos aidboxes.
      */
     private void ManageAidboxesMenu() {
         Scanner input = new Scanner(System.in);
@@ -191,6 +186,7 @@ public class Menus {
             switch (inputNum) {
                 case 1:
                     boolean codeExists = true;
+                    AidBoxImpl newAidBox;
                     while (codeExists) {
                         System.out.println("Enter the AidBox Code: ");
                         try {
@@ -223,9 +219,11 @@ public class Menus {
                         this.alertSystem.logCreater();
                         lixo = input.nextLine(); //clear buffer
                     }
-                    aidbox = new AidBoxImpl(aidcode, zone);
+                    newAidBox = new AidBoxImpl(aidcode, zone);
                     try {
-                        institution.addAidBox(this.aidbox);
+                        if (this.institution.addAidBox(newAidBox)) {
+                            System.out.print("AidBox successfully add to institution.\n");
+                        }
                     } catch (AidBoxException ex) {
                         System.out.println(ex.getMessage());
                         this.alertSystem = new AlertSystem(ex, ex.getMessage());
@@ -240,6 +238,11 @@ public class Menus {
                     String containerCode = "";
                     boolean codeValid = false;
 
+                    if (TypesManagement.getnTypes() == 0) {
+                        System.out.println("There are no container types avaliable.");
+                        break;
+                    }
+
                     while (aidboxExists) {
                         System.out.println("Enter the AidBox Code: ");
                         String aidboxCode = "";
@@ -250,7 +253,9 @@ public class Menus {
                                 if (institution.getAidBoxes()[i] != null && institution.getAidBoxes()[i].getCode().compareTo(aidboxCode) == 0) {
                                     System.out.println("Select one of the above container types: ");
                                     for (int j = 0; j < TypesManagement.getTypes().length; j++) {
-                                        System.out.println("" + j + ":\t" + TypesManagement.getTypes()[j]);
+                                        if (TypesManagement.getContainerTypes()[j] != null) {
+                                            System.out.println("" + j + ":\t" + TypesManagement.getTypes()[j]);
+                                        }
                                     }
                                     while (typeChoice < 0 || typeChoice >= TypesManagement.getTypes().length) {
                                         try {
@@ -277,16 +282,18 @@ public class Menus {
                                     System.out.println("Enter the container Code: ");
                                     try {
                                         containerCode = input.next();
-                                        codeValid = false;
+                                        codeValid = true;
                                         for (int j = 0; j < institution.getAidBoxes().length; j++) {
-                                            for (int k = 0; k < institution.getAidBoxes()[j].getContainers().length; k++) {
-                                                if (institution.getAidBoxes()[j].getContainers()[k] != null && institution.getAidBoxes()[j].getContainers()[k].getCode().compareTo(containerCode) == 0) {
-                                                    System.out.println("Code already exists. Please enter a different code.");
-                                                    codeValid = true;
-                                                    break;
+                                            if (institution.getAidBoxes()[j] != null) {
+                                                for (int k = 0; k < institution.getAidBoxes()[j].getContainers().length; k++) {
+                                                    if (institution.getAidBoxes()[j].getContainers()[k] != null && institution.getAidBoxes()[j].getContainers()[k].getCode().compareTo(containerCode) == 0) {
+                                                        System.out.println("Code already exists. Please enter a different code.");
+                                                        codeValid = false;
+                                                        break;
+                                                    }
                                                 }
                                             }
-                                            if (codeValid) {
+                                            if (!codeValid) {
                                                 break;
                                             }
                                         }
@@ -295,10 +302,10 @@ public class Menus {
                                         this.alertSystem = new AlertSystem(containerCode, "Invalid character.");
                                         this.alertSystem.logCreater();
                                         lixo = input.nextLine(); //clear buffer
-                                        codeValid = true;
+                                        codeValid = false;
                                     }
 
-                                    if (!codeValid) {
+                                    if (codeValid) {
                                         ContainerImpl container = new ContainerImpl(ct, containerCapacity, containerCode);
                                         for (int j = 0; j < institution.getAidBoxes().length; j++) {
                                             if (institution.getAidBoxes()[i] != null && institution.getAidBoxes()[i].getCode().compareTo(aidboxCode) == 0) {
@@ -352,8 +359,7 @@ public class Menus {
     /**
      * Método responsável por exibir o menu de veículos
      *
-     * @throws VehicleException exceção a ser lançada caso ocorra um erro com os
-     * veículos
+     * @throws VehicleException exceção a ser lançada caso ocorra um erro com os veículos
      */
     private void ManageVehiclesMenu() throws VehicleException {
         Scanner input = new Scanner(System.in);
