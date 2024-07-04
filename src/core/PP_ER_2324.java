@@ -26,7 +26,7 @@ import java.time.LocalDateTime;
 
 public class PP_ER_2324 {
 
-    public static void main(String[] args) throws AidBoxException, ContainerException, IOException, InstitutionException, VehicleException, PickingMapException {
+    public static void main(String[] args) throws AidBoxException, ContainerException, IOException, VehicleException{
         DataHandler dh = new DataHandler();
         InstitutionImpl instn = new InstitutionImpl();
         ImporterImpl importer = new ImporterImpl();
