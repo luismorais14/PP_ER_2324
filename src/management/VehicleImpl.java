@@ -9,6 +9,7 @@
  */
 package management;
 
+import com.estg.core.AidBox;
 import com.estg.core.Container;
 import com.estg.core.ContainerType;
 import com.estg.pickingManagement.Vehicle;
@@ -70,13 +71,16 @@ public class VehicleImpl implements Vehicle {
 
     /**
      * Método responsável por recolher um container
+     *
      * @param container container a ser recolhido
      * @return o sucesso ou insucesso da operação
      */
-    public boolean pickContainer(Container container) {
+    public boolean pickContainer(Container container, AidBox aidbox) {
         if (container == null) {
             return false;
         }
+
+        Container tmpContainer = container;
 
         ContainerTypeImpl type = (ContainerTypeImpl) container.getType();
         String typeName = type.getType();
@@ -97,10 +101,13 @@ public class VehicleImpl implements Vehicle {
             return false;
         }
 
-        for (int i = 0; i < this.emptyContainers[typeIndex].length; i++) {
-            if (this.emptyContainers[typeIndex][i] == null) {
-                this.emptyContainers[typeIndex][i] = container;
-                return true;
+        for (int i = 0; i < aidbox.getContainers().length; i++) {
+            if (aidbox.getContainers()[i].equals(container)) {
+                for (int j = 0; j < this.emptyContainers[typeIndex].length; j++) {
+                        container = this.emptyContainers[typeIndex][j];
+                        this.emptyContainers[typeIndex][j] = tmpContainer;
+                        return true;
+                }
             }
         }
 
@@ -116,6 +123,7 @@ public class VehicleImpl implements Vehicle {
     public String getCode() {
         return this.code;
     }
+
 
     /**
      * Método responsável por especificar as capacidades para cada tipo de container
@@ -154,6 +162,7 @@ public class VehicleImpl implements Vehicle {
 
     /**
      * Método responsável por criar containers vazios
+     *
      * @param size o número de contaiers a serem criados
      * @param type o tipo de containers a serem criados
      * @return a coleção de containers vazios
@@ -165,7 +174,6 @@ public class VehicleImpl implements Vehicle {
 
         for (int i = 0; i < nContainers; i++) {
             containers[i] = new ContainerImpl(ct, 0, "");
-            containers[i] = null;
         }
 
         return containers;
@@ -173,6 +181,7 @@ public class VehicleImpl implements Vehicle {
 
     /**
      * Método responsável por retornar a capacidade do veíclo em função do tipo recebido como parâmetro
+     *
      * @param ct o tipo de container
      * @return a capacidade do veículo para o tipo recebido como parâmetro
      */
@@ -208,6 +217,7 @@ public class VehicleImpl implements Vehicle {
 
     /**
      * Método responsável por mostrar em String o array de capacidades
+     *
      * @return a string do array de capacidades
      */
     private String showCapacities() {

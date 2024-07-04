@@ -91,7 +91,7 @@ public class ImporterImpl implements Importer {
     /**
      * Método responsável por ler as aidboxes da WEBAPI
      *
-     * @param instn
+     * @param instn instituição a carregar os dados
      */
     private void readAidBoxes(Institution instn) {
         JSONParser parser = new JSONParser();

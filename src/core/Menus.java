@@ -9,6 +9,7 @@
  */
 package core;
 
+import alerts.AlertSystem;
 import com.estg.core.ContainerType;
 import com.estg.core.Institution;
 import com.estg.core.exceptions.AidBoxException;
@@ -20,8 +21,7 @@ import com.estg.pickingManagement.Route;
 import com.estg.pickingManagement.RouteGenerator;
 import io.ImporterImpl;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -38,10 +38,11 @@ public class Menus {
     AidBoxImpl aidbox;
     ContainerImpl container;
     VehicleImpl vehicle;
-    Route route;                                            // Ver se estão certas estas variaveis 
+    Route route;
     PickingMapImpl pm;
     RouteGenerator rg;
     ReportImpl rp;
+    AlertSystem alertSystem;
 
     /**
      * Método construtor de Menus
@@ -56,7 +57,6 @@ public class Menus {
         this.pm = new PickingMapImpl();
         this.rg = new RouteGeneratorImpl();
         this.route = new RouteImpl();
-
     }
 
     /**
@@ -72,7 +72,8 @@ public class Menus {
         String aidcode = "";
         String lixo = "";
         boolean aidBoxFound = false;
-        while (!aux || inputNum != 5) {
+        while (!aux || inputNum != 6) {
+            inputNum = 0;
             System.out.println("================================");
             System.out.println("|       MENU SELECTION         |");
             System.out.println("================================");
@@ -81,7 +82,8 @@ public class Menus {
             System.out.println("|        2. Manage Vehicles    |");
             System.out.println("|        3. Import Data        |");
             System.out.println("|        4. Generate Routes    |");
-            System.out.println("|        5. Exit               |");
+            System.out.println("|        5. View Alerts        |");
+            System.out.println("|        6. Exit               |");
             System.out.println("================================");
             System.out.println("Enter your option: ");
             try {
@@ -89,22 +91,32 @@ public class Menus {
                 aux = true;
             } catch (InputMismatchException ex) {
                 System.out.println("Opção Inválida");
+                this.alertSystem = new AlertSystem(inputNum, "Opção Inválida");
+                this.alertSystem.logCreater();
                 lixo = input.nextLine(); //limpar o buffer
             }
             switch (inputNum) {
                 case 1:
                     this.ManageAidboxesMenu();
+                    lixo = input.nextLine(); //limpar o buffer
                     break;
                 case 2:
                     this.ManageVehiclesMenu();
+                    lixo = input.nextLine(); //limpar o buffer
                     break;
                 case 3:
                     this.ImportDataMenu();
+                    lixo = input.nextLine(); //limpar o buffer
                     break;
                 case 4:
                     this.generateRoutesMenu(this.institution);
+                    lixo = input.nextLine(); //limpar o buffer
                     break;
                 case 5:
+                    this.viewAlertsMenu();
+                    lixo = input.nextLine(); //limpar o buffer
+                    break;
+                case 6:
                     return;
                 default:
                     System.out.println("Invalid option. Please enter a number between 1 and 5.");
@@ -118,8 +130,6 @@ public class Menus {
      * Método responsável por exibir o menu de importação de dados e gerência a
      * importação de dados para a instituição
      *
-     * @throws AidBoxException    se ocorrer um erro em relação aos aidboxes.
-     * @throws ContainerException se ocorrer um erro em relaçao aos containers.
      */
     private void ImportDataMenu() {
         try {
@@ -144,7 +154,6 @@ public class Menus {
         boolean aux = false;
         int inputNum = 0;
         String aidcode = "";
-        int code = 0;
         String zone = "";
         String lixo = "";
         boolean aidBoxFound = false;
@@ -173,18 +182,21 @@ public class Menus {
                     while (codeExists) {
                         System.out.println("Enter the AidBox Code: ");
                         try {
-                            code = input.nextInt();
-                            aidcode = "CAIXF" + code;
+                            aidcode = input.next();
                             codeExists = false;
                             for (int i = 0; i < institution.getAidBoxes().length; i++) {
                                 if (institution.getAidBoxes()[i] != null && institution.getAidBoxes()[i].getCode().compareTo(aidcode) == 0) {
                                     System.out.println("Code already exists. Please enter a different code.");
+                                    this.alertSystem = new AlertSystem(institution.getAidBoxes()[i].getCode(), "Code already exists. Please enter a different code.");
+                                    this.alertSystem.logCreater();
                                     codeExists = true;
                                     break;
                                 }
                             }
                         } catch (InputMismatchException ex) {
                             System.out.println("Invalid character.");
+                            this.alertSystem = new AlertSystem(aidcode, "Invalid character.");
+                            this.alertSystem.logCreater();
                             lixo = input.nextLine(); //clear buffer
                             codeExists = true;
                         }
@@ -263,7 +275,12 @@ public class Menus {
                                         ContainerImpl container = new ContainerImpl(ct, containerCapacity, containerCode);
                                         for (int j = 0; j < institution.getAidBoxes().length; j++) {
                                             if (institution.getAidBoxes()[i] != null && institution.getAidBoxes()[i].getCode().compareTo(aidboxCode) == 0) {
-                                                institution.getAidBoxes()[i].addContainer(container);
+                                                try {
+                                                    institution.getAidBoxes()[i].addContainer(container);
+                                                } catch (ContainerException ex) {
+                                                    System.out.println("Error while add container.");
+                                                    System.out.println(ex.getMessage());
+                                                }
                                                 break;
                                             }
                                         }
@@ -377,6 +394,24 @@ public class Menus {
             }
         }
 
+    }
+
+    /**
+     * Método responsável por ler e imprimir os alertas criados
+     */
+    private void viewAlertsMenu() {
+        try {
+            File file = new File("Logger.txt");
+            FileReader fr = new FileReader(file);
+            BufferedReader br = new BufferedReader(fr);
+            String line;
+            while ((line = br.readLine()) != null) {
+                System.out.println(line);
+            }
+            fr.close();
+        } catch (IOException e) {
+            System.out.println("There are no alerts.");
+        }
     }
 
     /**

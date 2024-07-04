@@ -58,6 +58,7 @@ public class RouteGeneratorImpl implements RouteGenerator {
      * @param instn a instituição a serem recolhidos os containers.
      */
     private void collectHighCapacityContainer(Institution instn) throws AidBoxException {
+        InstitutionImpl institution = (InstitutionImpl) instn;
         Vehicle[] vehicles = instn.getVehicles();
         int numContainers = getTotalContainers(instn);
         int numHighCapacityContainers = getNumberOfHighCapacityContainers(instn) - pickedContainersIndex;
@@ -85,7 +86,7 @@ public class RouteGeneratorImpl implements RouteGenerator {
                         for (int k = 0; k < containers.length; k++) {
                             if (calcCapacityPercentage(containers[k]) > 80) {
                                 if (!verifyPickedContainer(containers[k], pickedContainersIndex)) {
-                                    if (vehicle.pickContainer(containers[k])) {
+                                    if (institution.pickContainer(vehicle,containers[k], aidBox)) {
                                         System.out.println("" + (nParagens + 1) + "º paragem: " + aidBox.getCode());
                                         System.out.println("Container recolhido: " + containers[k].getCode());
                                         nPickedContainers++;
@@ -142,6 +143,7 @@ public class RouteGeneratorImpl implements RouteGenerator {
      * @param instn a instituição a serem recolhidos os containers.
      */
     private void getPerishableFoodContainers(Institution instn) throws AidBoxException {
+        InstitutionImpl institution = (InstitutionImpl) instn;
         Vehicle[] vehicles = instn.getVehicles();
         ContainerType type = TypesManagement.findByType("perishable food");
         int nParagens;
@@ -183,7 +185,7 @@ public class RouteGeneratorImpl implements RouteGenerator {
                     System.out.println("" + (nParagens + 1) + "º paragem: " + aidBox.getCode());
                     for (int k = 0; k < containers.length && totalPickedContainers < vehicle.getCapacity(type); k++) { // for que percorre os containers
                         if (containers[k].getType().equals(type)) {
-                            if (vehicle.pickContainer(containers[k])) {
+                            if (institution.pickContainer(vehicle, containers[k], instn.getAidBoxes()[j])) {
                                 System.out.println("Container recolhido: " + containers[k].getCode());
                                 this.pickedContainers[this.pickedContainersIndex] = containers[k];
                                 this.nPickedContainers++;
@@ -191,7 +193,7 @@ public class RouteGeneratorImpl implements RouteGenerator {
                             }
                             pickingContainers++;
                         } else if (this.calcCapacityPercentage(containers[k]) > 80) {
-                            if (vehicle.pickContainer(containers[k])) {
+                            if (institution.pickContainer(vehicle, containers[k], instn.getAidBoxes()[j])) {
                                 System.out.println("Container recolhido: " + containers[k].getCode());
                                 this.pickedContainers[this.pickedContainersIndex] = containers[k];
                                 this.nPickedContainers++;

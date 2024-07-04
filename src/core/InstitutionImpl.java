@@ -444,6 +444,28 @@ public class InstitutionImpl implements Institution {
     }
 
     /**
+     * Método responsável por recolher um container
+     * @param vhcl veículo
+     * @param cntnr container a recolher
+     */
+    public boolean pickContainer(Vehicle vhcl, Container cntnr, AidBox aidbox) {
+        for (int i = 0; i < this.vehiclesManagement.getVehicles().length; i++) {
+            VehicleImpl vehicle = (VehicleImpl) this.vehiclesManagement.getVehicles()[i];
+            if (vehicle.equals(vhcl)) {
+                for (int j = 0; j < this.aidboxes.getAidBoxes().length; j++) {
+                    AidBoxImpl aid = (AidBoxImpl) this.aidboxes.getAidBoxes()[j];
+                    if (aid.equals(aidbox)) {
+                        if (vehicle.pickContainer(cntnr, aidbox)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
      * Método responsável por retornar a posição na coleção da aidbox com o
      * container recebido como parâmetro
      *
