@@ -9,6 +9,7 @@
  */
 package io;
 
+import alerts.AlertSystem;
 import com.estg.io.HTTPProvider;
 
 import java.io.File;
@@ -16,6 +17,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class DataHandler {
+
+    AlertSystem alertSystem;
 
     /**
      * Método responsável por guardar os dados da WEBAPI em ficheiro .json
@@ -32,15 +35,16 @@ public class DataHandler {
                 System.out.println("Folder created");
             } else {
                 System.out.println("Folder creation failed");
+                this.alertSystem = new AlertSystem(fdir.mkdirs(), "Folder creation failed.");
+                this.alertSystem.logCreater();
             }
-        } else {
-            System.out.println("Folder already exists");
         }
-
         try {
             fw = new FileWriter("JSONFiles\\AidBoxes.json");
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
+            this.alertSystem = new AlertSystem(ex, ex.getMessage());
+            this.alertSystem.logCreater();
             return;
         }
         fw.write(str);
@@ -58,23 +62,24 @@ public class DataHandler {
 
         File fdir = new File("JSONFiles");
         if (!fdir.exists()) {
-            if(fdir.mkdirs()){
+            if (fdir.mkdirs()) {
                 System.out.println("Folder created");
             } else {
                 System.out.println("Folder creation failed");
+                this.alertSystem = new AlertSystem(fdir.mkdirs(), "Folder creation failed.");
+                this.alertSystem.logCreater();
             }
-        } else {
-            System.out.println("Folder already exists");
+            try {
+                fw = new FileWriter("JSONFiles\\Containers.json");
+            } catch (IOException ex) {
+                System.out.println(ex.getMessage());
+                this.alertSystem = new AlertSystem(ex, ex.getMessage());
+                this.alertSystem.logCreater();
+                return;
+            }
+            fw.write(str);
+            fw.close();
         }
-
-        try {
-            fw = new FileWriter("JSONFiles\\Containers.json");
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-            return;
-        }
-        fw.write(str);
-        fw.close();
     }
 
     /**
@@ -92,15 +97,16 @@ public class DataHandler {
                 System.out.println("Folder created");
             } else {
                 System.out.println("Folder creation failed");
+                this.alertSystem = new AlertSystem(fdir.mkdirs(), "Folder creation failed.");
+                this.alertSystem.logCreater();
             }
-        } else {
-            System.out.println("Folder already exists");
         }
-
         try {
             fw = new FileWriter("JSONFiles\\Distances.json");
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
+            this.alertSystem = new AlertSystem(ex, ex.getMessage());
+            this.alertSystem.logCreater();
             return;
         }
         fw.write(str);
@@ -122,15 +128,16 @@ public class DataHandler {
                 System.out.println("Folder created");
             } else {
                 System.out.println("Folder creation failed");
+                this.alertSystem = new AlertSystem(fdir.mkdirs(), "Folder creation failed.");
+                this.alertSystem.logCreater();
             }
-        } else {
-            System.out.println("Folder already exists");
         }
-
         try {
             fw = new FileWriter("JSONFiles\\Types.json");
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
+            this.alertSystem = new AlertSystem(ex, ex.getMessage());
+            this.alertSystem.logCreater();
             return;
         }
         fw.write(str);
@@ -152,15 +159,17 @@ public class DataHandler {
                 System.out.println("Folder created");
             } else {
                 System.out.println("Folder creation failed");
+                this.alertSystem = new AlertSystem(fdir.mkdirs(), "Folder creation failed.");
+                this.alertSystem.logCreater();
             }
-        } else {
-            System.out.println("Folder already exists");
         }
 
         try {
             fw = new FileWriter("JSONFiles\\Vehicles.json");
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
+            this.alertSystem = new AlertSystem(ex, ex.getMessage());
+            this.alertSystem.logCreater();
             return;
         }
         fw.write(str);
@@ -182,15 +191,17 @@ public class DataHandler {
                 System.out.println("Folder created");
             } else {
                 System.out.println("Folder creation failed");
+                this.alertSystem = new AlertSystem(fdir.mkdirs(), "Folder creation failed.");
+                this.alertSystem.logCreater();
             }
-        } else {
-            System.out.println("Folder already exists");
         }
 
         try {
             fw = new FileWriter("JSONFiles\\Readings.json");
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
+            this.alertSystem = new AlertSystem(ex, ex.getMessage());
+            this.alertSystem.logCreater();
             return;
         }
         fw.write(str);

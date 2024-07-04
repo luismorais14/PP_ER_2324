@@ -110,6 +110,10 @@ public class MeasurementImpl implements Measurement{
         return true;
     }
 
+    /**
+     * Método responsável por criar uma deep copy da instância atual
+     * @return a deep copy
+     */
     protected Object getClone() {
         return new MeasurementImpl(this);
     }

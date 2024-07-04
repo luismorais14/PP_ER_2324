@@ -9,6 +9,7 @@
  */
 package io;
 
+import alerts.AlertSystem;
 import com.estg.core.ContainerType;
 import com.estg.core.Institution;
 import com.estg.core.Measurement;
@@ -32,9 +33,10 @@ import java.time.format.DateTimeParseException;
 
 public class ImporterImpl implements Importer {
 
-    ContainerManagement containerManagement = new ContainerManagement();
-    MeasurementsManagement measurementsManagement = new MeasurementsManagement();
-    AidBoxManagement aidBoxManagement = new AidBoxManagement();
+    private ContainerManagement containerManagement = new ContainerManagement();
+    private MeasurementsManagement measurementsManagement = new MeasurementsManagement();
+    private AidBoxManagement aidBoxManagement = new AidBoxManagement();
+    private AlertSystem alertSystem = new AlertSystem();
 
 
     @Override
@@ -43,16 +45,13 @@ public class ImporterImpl implements Importer {
             throw new InstitutionException("Institution object is null");
         }
 
-        try {
-            this.readContainerTypes();
-            this.readVehicles(instn);
-            this.readContainers();
-            this.readMeasurements();
-            this.readAidBoxes(instn);
-            this.addMeasurementsToInstitution(instn);
-        } catch (VehicleException ex) {
-            System.out.println(ex.getMessage());
-        }
+        this.readContainerTypes();
+        this.readVehicles(instn);
+        this.readContainers();
+        this.readMeasurements();
+        this.readAidBoxes(instn);
+        this.addMeasurementsToInstitution(instn);
+
 
     }
 
@@ -60,9 +59,8 @@ public class ImporterImpl implements Importer {
      * Método responsável por ler os veículos da WEBAPI
      *
      * @param instn instituição onde serão guardados os dados
-     * @throws VehicleException exceção a ser lançada caso o veículo a ser adicionado à coleção seja null
      */
-    private void readVehicles(Institution instn) throws VehicleException {
+    private void readVehicles(Institution instn) throws FileNotFoundException{
         JSONParser parser = new JSONParser();
         JSONArray ja;
         String vehicleCode;
@@ -79,12 +77,18 @@ public class ImporterImpl implements Importer {
                     System.out.println("Erro ao adicionar veículo");
                 }
             }
-        } catch (FileNotFoundException ex) {
-            System.out.println(ex.getMessage());
         } catch (ParseException ex) {
             System.out.println(ex.getMessage());
+            this.alertSystem = new AlertSystem(ex, ex.getMessage());
+            this.alertSystem.logCreater();
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
+            this.alertSystem = new AlertSystem(ex, ex.getMessage());
+            this.alertSystem.logCreater();
+        } catch (VehicleException ex) {
+            System.out.println(ex.getMessage());
+            this.alertSystem = new AlertSystem(ex, ex.getMessage());
+            this.alertSystem.logCreater();
         }
     }
 
@@ -93,7 +97,7 @@ public class ImporterImpl implements Importer {
      *
      * @param instn instituição a carregar os dados
      */
-    private void readAidBoxes(Institution instn) {
+    private void readAidBoxes(Institution instn) throws FileNotFoundException {
         JSONParser parser = new JSONParser();
         JSONArray aidboxesArray;
         JSONArray containerArray;
@@ -128,19 +132,21 @@ public class ImporterImpl implements Importer {
                 }
                 institution.setAidBoxes(this.aidBoxManagement.getAidBoxes());
             }
-        } catch (FileNotFoundException ex) {
-            System.out.println(ex.getMessage());
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
+            this.alertSystem = new AlertSystem(ex, ex.getMessage());
+            this.alertSystem.logCreater();
         } catch (ParseException ex) {
             System.out.println(ex.getMessage());
+            this.alertSystem = new AlertSystem(ex, ex.getMessage());
+            this.alertSystem.logCreater();
         }
     }
 
     /**
      * Método responsável por ler os containers da WEBAPI
      */
-    private void readContainers() {
+    private void readContainers() throws FileNotFoundException {
         JSONParser parser = new JSONParser();
         JSONArray containerArray;
         double containerCapacity;
@@ -163,10 +169,16 @@ public class ImporterImpl implements Importer {
             }
         } catch (ParseException ex) {
             System.out.println(ex.getMessage());
+            this.alertSystem = new AlertSystem(ex, ex.getMessage());
+            this.alertSystem.logCreater();
         } catch (FileNotFoundException ex) {
             System.out.println(ex.getMessage());
+            this.alertSystem = new AlertSystem(ex, ex.getMessage());
+            this.alertSystem.logCreater();
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
+            this.alertSystem = new AlertSystem(ex, ex.getMessage());
+            this.alertSystem.logCreater();
         }
     }
 
@@ -213,13 +225,18 @@ public class ImporterImpl implements Importer {
             }
         } catch (ParseException ex) {
             System.out.println(ex.getMessage());
+            this.alertSystem = new AlertSystem(ex, ex.getMessage());
+            this.alertSystem.logCreater();
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
+            this.alertSystem = new AlertSystem(ex, ex.getMessage());
+            this.alertSystem.logCreater();
         }
     }
 
     /**
      * Método responsável por carregar as measurements para a instituição recebida como parâmetro
+     *
      * @param inst a instituição a adicionar as medições
      */
     private void addMeasurementsToInstitution(Institution inst) {

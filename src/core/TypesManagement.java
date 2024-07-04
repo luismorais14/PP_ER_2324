@@ -9,6 +9,7 @@
  */
 package core;
 
+import alerts.AlertSystem;
 import com.estg.core.ContainerType;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -25,6 +26,7 @@ public class TypesManagement {
 
     private static String[] types = new String[ARRAY_SIZE];
     private static ContainerType[] containerTypes = new ContainerType[ARRAY_SIZE];
+    private static AlertSystem alertSystem = new AlertSystem();
 
     /**
      * Método responsável por retornar a coleção de tipos em String
@@ -60,10 +62,16 @@ public class TypesManagement {
             }
         } catch (ParseException ex) {
             System.out.println(ex.getMessage());
+            alertSystem = new AlertSystem(ex, ex.getMessage());
+            alertSystem.logCreater();
         } catch (FileNotFoundException ex) {
             System.out.println(ex.getMessage());
+            alertSystem = new AlertSystem(ex, ex.getMessage());
+            alertSystem.logCreater();
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
+            alertSystem = new AlertSystem(ex, ex.getMessage());
+            alertSystem.logCreater();
         }
     }
 

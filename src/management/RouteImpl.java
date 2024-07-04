@@ -9,6 +9,7 @@
  */
 package management;
 
+import alerts.AlertSystem;
 import com.estg.core.AidBox;
 import com.estg.core.exceptions.AidBoxException;
 import com.estg.pickingManagement.Report;
@@ -24,6 +25,7 @@ public class RouteImpl implements Route {
     private AidBoxManagement aidBoxManagement;
     private Vehicle vehicle;
     private Report report;
+    private AlertSystem alertSystem = new AlertSystem();
 
     /**
      * Construtor de RouteImpl
@@ -108,6 +110,8 @@ public class RouteImpl implements Route {
             this.aidBoxManagement.removeAidBox(aidbox);
         } catch (AidBoxException ex) {
             System.out.println(ex.getMessage());
+            this.alertSystem = new AlertSystem(ex, ex.getMessage());
+            this.alertSystem.logCreater();
             return null;
         }
         return aidbox;
@@ -216,6 +220,8 @@ public class RouteImpl implements Route {
                 }
             } catch (AidBoxException ex) {
                 System.out.println(ex.getMessage());
+                this.alertSystem = new AlertSystem(ex, ex.getMessage());
+                this.alertSystem.logCreater();
                 return 0.0;
             }
         }
@@ -237,6 +243,8 @@ public class RouteImpl implements Route {
                 }
             } catch (AidBoxException ex) {
                 System.out.println(ex.getMessage());
+                this.alertSystem = new AlertSystem(ex, ex.getMessage());
+                this.alertSystem.logCreater();
                 return 0.0;
             }
         }
@@ -282,6 +290,8 @@ public class RouteImpl implements Route {
             }
         } catch (CloneNotSupportedException ex) {
             System.out.println(ex.getMessage());
+            this.alertSystem = new AlertSystem(ex, ex.getMessage());
+            this.alertSystem.logCreater();
             return null;
         }
 

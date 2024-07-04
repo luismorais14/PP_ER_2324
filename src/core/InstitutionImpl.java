@@ -9,6 +9,7 @@
  */
 package core;
 
+import alerts.AlertSystem;
 import com.estg.core.AidBox;
 import com.estg.core.Container;
 import com.estg.core.ContainerType;
@@ -40,10 +41,11 @@ public class InstitutionImpl implements Institution {
     private final int ARRAY_SIZE = 10;
 
     private String InstitutionName;
-    private PickingMapManagement pickingMaps;
+    private PickingMapManagement pickingMaps = new PickingMapManagement();
     private AidBoxManagement aidboxes;
     private MeasurementsManagement measurements;
     private VehicleManagement vehiclesManagement;
+    private AlertSystem alertSystem;
 
     /**
      * Construtor de Institution
@@ -54,6 +56,7 @@ public class InstitutionImpl implements Institution {
         this.measurements = new MeasurementsManagement();
         this.vehiclesManagement = new VehicleManagement();
         this.pickingMaps = new PickingMapManagement();
+        this.alertSystem = new AlertSystem();
     }
 
     /**
@@ -66,6 +69,7 @@ public class InstitutionImpl implements Institution {
         this.measurements = new MeasurementsManagement();
         this.vehiclesManagement = new VehicleManagement();
         this.pickingMaps = new PickingMapManagement();
+        this.alertSystem = new AlertSystem();
     }
 
     /**
@@ -83,6 +87,7 @@ public class InstitutionImpl implements Institution {
         this.aidboxes.setAidBox(aidbox);
         this.measurements.setMeasurements(measurement);
         this.vehiclesManagement.setEnabledVehiclesVehicles(vehicles);
+        this.alertSystem = new AlertSystem();
     }
 
     /**
@@ -383,12 +388,18 @@ public class InstitutionImpl implements Institution {
             }
         } catch (ParseException ex) {
             System.out.println(ex.getMessage());
+            this.alertSystem = new AlertSystem(ex, ex.getMessage());
+            this.alertSystem.logCreater();
             return 0.0;
         } catch (FileNotFoundException ex) {
             System.out.println(ex.getMessage());
+            this.alertSystem = new AlertSystem(ex, ex.getMessage());
+            this.alertSystem.logCreater();
             return 0.0;
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
+            this.alertSystem = new AlertSystem(ex, ex.getMessage());
+            this.alertSystem.logCreater();
             return 0.0;
         }
         return distance;
@@ -432,12 +443,18 @@ public class InstitutionImpl implements Institution {
             }
         } catch (ParseException ex) {
             System.out.println(ex.getMessage());
+            this.alertSystem = new AlertSystem(ex, ex.getMessage());
+            this.alertSystem.logCreater();
             return 0.0;
         } catch (FileNotFoundException ex) {
             System.out.println(ex.getMessage());
+            this.alertSystem = new AlertSystem(ex, ex.getMessage());
+            this.alertSystem.logCreater();
             return 0.0;
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
+            this.alertSystem = new AlertSystem(ex, ex.getMessage());
+            this.alertSystem.logCreater();
             return 0.0;
         }
         return duration;
@@ -507,6 +524,8 @@ public class InstitutionImpl implements Institution {
             }
         } catch (CloneNotSupportedException ex) {
             System.out.println(ex.getMessage());
+            this.alertSystem = new AlertSystem(ex, ex.getMessage());
+            this.alertSystem.logCreater();
             return null;
         }
 
@@ -529,6 +548,8 @@ public class InstitutionImpl implements Institution {
             newContainer = (ContainerImpl) container1.clone();
         } catch (CloneNotSupportedException ex) {
             System.out.println(ex.getMessage());
+            this.alertSystem = new AlertSystem(ex, ex.getMessage());
+            this.alertSystem.logCreater();
             return null;
         }
 

@@ -9,6 +9,7 @@
  */
 package management;
 
+import alerts.AlertSystem;
 import com.estg.core.AidBox;
 import com.estg.core.Container;
 import com.estg.core.ContainerType;
@@ -31,9 +32,10 @@ public class RouteGeneratorImpl implements RouteGenerator {
     private Route[] routes = new Route[ARRAY_SIZE];
     private static int nRoutes = 0;
     private Container[] pickedContainers;
-    int pickedContainersIndex = 0;
+    private int pickedContainersIndex = 0;
     private Vehicle[] usedVehicles;
-    int nVehiclesUsed = 0;
+    private int nVehiclesUsed = 0;
+    private AlertSystem alertSystem = new AlertSystem();
 
     /**
      * Método responsável por gerar as rotas
@@ -48,6 +50,8 @@ public class RouteGeneratorImpl implements RouteGenerator {
             this.collectHighCapacityContainer(instn);
         } catch (AidBoxException ex) {
             System.out.println(ex.getMessage());
+            this.alertSystem = new AlertSystem(ex, ex.getMessage());
+            this.alertSystem.logCreater();
         }
         return routes;
     }

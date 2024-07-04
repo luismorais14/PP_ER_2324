@@ -157,11 +157,9 @@ public class Menus {
 
     /**
      * Método responsável por exibir o menu de gerir aidboxes
-     *
-     * @throws AidBoxException exceção a ser lançada caso ocorra um erro
      * relacionado aos aidboxes.
      */
-    private void ManageAidboxesMenu() throws AidBoxException, ContainerException {
+    private void ManageAidboxesMenu() {
         Scanner input = new Scanner(System.in);
         boolean aux = false;
         int inputNum = 0;
@@ -226,7 +224,13 @@ public class Menus {
                         lixo = input.nextLine(); //clear buffer
                     }
                     aidbox = new AidBoxImpl(aidcode, zone);
-                    institution.addAidBox(this.aidbox);
+                    try {
+                        institution.addAidBox(this.aidbox);
+                    } catch (AidBoxException ex) {
+                        System.out.println(ex.getMessage());
+                        this.alertSystem = new AlertSystem(ex, ex.getMessage());
+                        this.alertSystem.logCreater();
+                    }
                     break;
                 case 2:
                     boolean aidboxExists = true;

@@ -11,8 +11,6 @@ package core;
 
 import com.estg.core.Container;
 import com.estg.core.exceptions.AidBoxException;
-import com.estg.pickingManagement.Vehicle;
-import management.VehicleImpl;
 
 public class ContainerManagement {
     private final int ARRAY_SIZE = 0;

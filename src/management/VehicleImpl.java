@@ -9,6 +9,7 @@
  */
 package management;
 
+import alerts.AlertSystem;
 import com.estg.core.AidBox;
 import com.estg.core.Container;
 import com.estg.core.ContainerType;
@@ -37,6 +38,7 @@ public class VehicleImpl implements Vehicle {
     private double[] capacities;
     private static int nCapacities = 0;
     private Container[][] emptyContainers;
+    private AlertSystem alertSystem;
 
     /**
      * Construtor de VehicleImpl
@@ -153,10 +155,16 @@ public class VehicleImpl implements Vehicle {
             }
         } catch (ParseException ex) {
             System.out.println(ex.getMessage());
+            this.alertSystem = new AlertSystem(ex, ex.getMessage());
+            this.alertSystem.logCreater();
         } catch (FileNotFoundException ex) {
             System.out.println(ex.getMessage());
+            this.alertSystem = new AlertSystem(ex, ex.getMessage());
+            this.alertSystem.logCreater();
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
+            this.alertSystem = new AlertSystem(ex, ex.getMessage());
+            this.alertSystem.logCreater();
         }
     }
 

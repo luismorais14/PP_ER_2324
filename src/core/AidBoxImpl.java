@@ -9,6 +9,7 @@
  */
 package core;
 
+import alerts.AlertSystem;
 import com.estg.core.AidBox;
 import com.estg.core.Container;
 import com.estg.core.ContainerType;
@@ -32,6 +33,7 @@ public class AidBoxImpl implements AidBox {
     private String code;
     private String zone;
     private ContainerManagement containerManagement;
+    private AlertSystem alertSystem;
 
     /**
      * Construtor de AidBox
@@ -40,7 +42,7 @@ public class AidBoxImpl implements AidBox {
         this.code = "";
         this.zone = "";
         this.containerManagement = new ContainerManagement();
-
+        this.alertSystem = new AlertSystem();
     }
 
     /**
@@ -138,12 +140,18 @@ public class AidBoxImpl implements AidBox {
             }
         } catch (ParseException ex) {
             System.out.println(ex.getMessage());
+            this.alertSystem = new AlertSystem(ex, ex.getMessage());
+            this.alertSystem.logCreater();
             return 0.0;
         } catch (FileNotFoundException ex) {
             System.out.println(ex.getMessage());
+            this.alertSystem = new AlertSystem(ex, ex.getMessage());
+            this.alertSystem.logCreater();
             return 0.0;
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
+            this.alertSystem = new AlertSystem(ex, ex.getMessage());
+            this.alertSystem.logCreater();
             return 0.0;
         }
         return distance;
@@ -188,12 +196,18 @@ public class AidBoxImpl implements AidBox {
             }
         } catch (ParseException ex) {
             System.out.println(ex.getMessage());
+            this.alertSystem = new AlertSystem(ex, ex.getMessage());
+            this.alertSystem.logCreater();
             return 0.0;
         } catch (FileNotFoundException ex) {
             System.out.println(ex.getMessage());
+            this.alertSystem = new AlertSystem(ex, ex.getMessage());
+            this.alertSystem.logCreater();
             return 0.0;
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
+            this.alertSystem = new AlertSystem(ex, ex.getMessage());
+            this.alertSystem.logCreater();
             return 0.0;
         }
         return duration;
@@ -290,6 +304,8 @@ public class AidBoxImpl implements AidBox {
             }
         } catch (CloneNotSupportedException ex) {
             System.out.println(ex.getMessage());
+            this.alertSystem = new AlertSystem(ex, ex.getMessage());
+            this.alertSystem.logCreater();
         }
 
         return newContainer;
