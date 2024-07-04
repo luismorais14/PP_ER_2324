@@ -151,29 +151,6 @@ public class ContainerImpl implements Container {
     }
 
     /**
-     * Método responsável por verificar se o tipo do container atual é igual ao tipo do container recebido como parâmetro
-     * @param obj container a ser verificado o tipo
-     * @return o sucesso ou insucesso da operação
-     */
-    public boolean verifyContainerType(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Container other = (Container) obj;
-
-        if (!this.getType().equals(other.getType())) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
      * Método que cria uma (deep) copy da coleção de measurements
      *
      * @param measurements a coleção de measurements a fazer uma (deep) copy

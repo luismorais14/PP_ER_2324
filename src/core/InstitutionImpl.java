@@ -19,7 +19,6 @@ import com.estg.core.exceptions.ContainerException;
 import com.estg.core.exceptions.MeasurementException;
 import com.estg.core.exceptions.PickingMapException;
 import com.estg.core.exceptions.VehicleException;
-import com.estg.io.HTTPProvider;
 import com.estg.pickingManagement.PickingMap;
 import com.estg.pickingManagement.Vehicle;
 
@@ -392,6 +391,55 @@ public class InstitutionImpl implements Institution {
             return 0.0;
         }
         return distance;
+    }
+
+    /**
+     * Metodo responsável por retornar a duração entre a instituição atual e o
+     * parâmetro aidbox
+     *
+     * @param aidbox aidbox para calcular a duração
+     * @return a duração entre a instituição atual e a aidbox recebida como
+     * parâmetro
+     * @throws AidBoxException exceção a ser lançada se a aidbox não existir
+     */
+    public double getDuration(AidBox aidbox) throws AidBoxException {
+        if (aidbox == null) {
+            throw new AidBoxException("AidBox is null");
+        }
+        JSONArray ja;
+        JSONParser parser = new JSONParser();
+        double duration = 0.0;
+        try {
+            FileReader fileReader = new FileReader("JSONFiles\\Distances.json");
+            ja = (JSONArray) parser.parse(fileReader);
+            for (Object obj : ja) {
+                JSONObject jsonObject = (JSONObject) obj;
+                String aidboxCode = (String) jsonObject.get("from");
+                if (aidboxCode.compareTo(aidbox.getCode()) == 0) {
+                    JSONArray aidboxes = (JSONArray) jsonObject.get("to");
+                    for (Object aidboxesObj : aidboxes) {
+                        JSONObject aidboxObject = (JSONObject) aidboxesObj;
+                        String institutionName = (String) aidboxObject.get("name");
+                        if (institutionName.compareTo("Base") == 0) {
+                            Object distanceObj = aidboxObject.get("duration");
+                            if (distanceObj instanceof Number) {
+                                duration = ((Number) distanceObj).doubleValue();
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (ParseException ex) {
+            System.out.println(ex.getMessage());
+            return 0.0;
+        } catch (FileNotFoundException ex) {
+            System.out.println(ex.getMessage());
+            return 0.0;
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+            return 0.0;
+        }
+        return duration;
     }
 
     /**

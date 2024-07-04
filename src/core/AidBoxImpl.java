@@ -37,8 +37,8 @@ public class AidBoxImpl implements AidBox {
      * Construtor de AidBox
      */
     public AidBoxImpl() {
-        this.code = null;
-        this.zone = null;
+        this.code = "";
+        this.zone = "";
         this.containerManagement = new ContainerManagement();
 
     }

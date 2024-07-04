@@ -18,10 +18,7 @@ import com.estg.pickingManagement.Report;
 import com.estg.pickingManagement.Route;
 import com.estg.pickingManagement.RouteGenerator;
 import com.estg.pickingManagement.Vehicle;
-import core.AidBoxImpl;
-import core.ContainerImpl;
-import core.ContainerTypeImpl;
-import core.TypesManagement;
+import core.*;
 
 import java.time.LocalDateTime;
 
@@ -38,7 +35,11 @@ public class RouteGeneratorImpl implements RouteGenerator {
     private Vehicle[] usedVehicles;
     int nVehiclesUsed = 0;
 
-
+    /**
+     * Método responsável por gerar as rotas
+     * @param instn instituição a gerar rotas
+     * @return a coleção de rotas
+     */
     @Override
     public Route[] generateRoutes(Institution instn) {
         try {
@@ -113,8 +114,8 @@ public class RouteGeneratorImpl implements RouteGenerator {
 
             nNonPickedContainers = numContainers - nPickedContainers;
 
-            double totalDistance = calcTotalDistance(currentlyUsedAidboxes, nCurrentlyUsedAidboxes);
-            double totalDuration = calcTotalDuration(currentlyUsedAidboxes, nCurrentlyUsedAidboxes);
+            double totalDistance = calcTotalDistance(instn, currentlyUsedAidboxes, nCurrentlyUsedAidboxes);
+            double totalDuration = calcTotalDuration(instn, currentlyUsedAidboxes, nCurrentlyUsedAidboxes);
 
             System.out.println("\n");
             ReportImpl report = new ReportImpl(1, nPickedContainers, totalDistance, totalDuration, nNonPickedContainers, instn.getVehicles().length - 1, LocalDateTime.now());
@@ -169,7 +170,7 @@ public class RouteGeneratorImpl implements RouteGenerator {
 
             for (int j = 0; j < instn.getAidBoxes().length; j++) { // for que percorre aidboxes
                 AidBoxImpl aidBox = (AidBoxImpl) instn.getAidBoxes()[j];
-                if (j > 0 && nAidBoxesUsed > 0) {
+                if (nAidBoxesUsed > 0) {
                     if (this.verifyAidBoxUsage(aidboxesUsed, aidBox, nAidBoxesUsed)) {
                         continue;
                     }
@@ -177,6 +178,7 @@ public class RouteGeneratorImpl implements RouteGenerator {
                 Container[] containers = aidBox.getContainers();
                 if (this.verifyPerishableFoodContainer(aidBox)) {
                     aidboxesUsed[nAidBoxesUsed] = aidBox;
+                    nAidBoxesUsed++;
                     currentlyUsedAidboxes[nCurrentlyUsedAidboxes] = aidBox;
                     System.out.println("" + (nParagens + 1) + "º paragem: " + aidBox.getCode());
                     for (int k = 0; k < containers.length && totalPickedContainers < vehicle.getCapacity(type); k++) { // for que percorre os containers
@@ -200,15 +202,14 @@ public class RouteGeneratorImpl implements RouteGenerator {
                     totalPickedContainers++;
                     nCurrentlyUsedAidboxes++;
                     nParagens++;
-                    nAidBoxesUsed++;
                 }
                 if (totalPickedContainers == vehicle.getCapacity(type)) {
                     break;
                 }
             }
             this.nNonPickedContainers = numContainers - this.nPickedContainers;
-            double totalDistance = this.calcTotalDistance(currentlyUsedAidboxes, nCurrentlyUsedAidboxes);
-            double totalDuration = this.calcTotalDuration(currentlyUsedAidboxes, nCurrentlyUsedAidboxes);
+            double totalDistance = this.calcTotalDistance(instn, currentlyUsedAidboxes, nCurrentlyUsedAidboxes);
+            double totalDuration = this.calcTotalDuration(instn, currentlyUsedAidboxes, nCurrentlyUsedAidboxes);
             System.out.println("\n");
             ReportImpl report = new ReportImpl(1, this.nPickedContainers, totalDistance, totalDuration, this.nNonPickedContainers, instn.getVehicles().length - 1, LocalDateTime.now());
             RouteImpl route = new RouteImpl(vehicle, report);
@@ -348,10 +349,15 @@ public class RouteGeneratorImpl implements RouteGenerator {
      * @throws AidBoxException exceção a ser lançada caso a aidbox a calcular a
      *                         duração seja null
      */
-    private double calcTotalDuration(AidBox[] aidboxes, int size) throws AidBoxException {
+    private double calcTotalDuration(Institution institution, AidBox[] aidboxes, int size) throws AidBoxException {
+        InstitutionImpl instn = (InstitutionImpl) institution;
         double totalDuration = 0.0;
         for (int i = 1; i < size; i++) {
             totalDuration += aidboxes[i - 1].getDuration(aidboxes[i]);
+        }
+        if (aidboxes[0] != null && aidboxes[size] != null) {
+            totalDuration += instn.getDuration(aidboxes[0]);
+            totalDuration += ((InstitutionImpl) institution).getDuration(aidboxes[size]);
         }
         return totalDuration;
     }
@@ -364,10 +370,14 @@ public class RouteGeneratorImpl implements RouteGenerator {
      * @throws AidBoxException exceção a ser lançada caso a aidbox a calcular a
      *                         distância seja null
      */
-    private double calcTotalDistance(AidBox[] aidboxes, int size) throws AidBoxException {
+    private double calcTotalDistance(Institution institution, AidBox[] aidboxes, int size) throws AidBoxException {
         double totalDistance = 0.0;
         for (int i = 1; i < size; i++) {
             totalDistance += aidboxes[i - 1].getDistance(aidboxes[i]);
+        }
+        if (aidboxes[0] != null && aidboxes[size] != null){
+            totalDistance += institution.getDistance(aidboxes[0]);
+            totalDistance += institution.getDistance(aidboxes[size]);
         }
         return totalDistance;
     }

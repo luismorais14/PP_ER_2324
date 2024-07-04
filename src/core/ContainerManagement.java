@@ -16,7 +16,7 @@ public class ContainerManagement {
     private final int ARRAY_SIZE = 0;
 
     private Container[] containers;
-    private static int nContainers = 0;
+    private int nContainers = 0;
 
     /**
      * Método construtor de ContainerManagement
@@ -64,12 +64,12 @@ public class ContainerManagement {
         }
         if (checkContainerExistence(cntnr)) {
             return false;
-        } else if (nContainers == this.containers.length) {
+        } else if (nContainers >=  this.containers.length) {
             this.expandContainerArray();
         }
 
         this.containers[nContainers] = cntnr;
-        nContainers++;
+        this.nContainers++;
         return true;
     }
 
@@ -154,7 +154,7 @@ public class ContainerManagement {
         for (int i = 0; i < this.containers.length; i++) {
             ContainerImpl tempContainer = (ContainerImpl) this.containers[i];
             if (tempContainer != null) {
-                if (tempContainer.verifyContainerType(container)) {
+                if (tempContainer.getType().equals(container.getType())) {
                     return true;
                 }
             }

@@ -10,6 +10,7 @@
 package core;
 
 import com.estg.core.ContainerType;
+import com.estg.core.Institution;
 import com.estg.core.exceptions.AidBoxException;
 import com.estg.core.exceptions.ContainerException;
 import com.estg.core.exceptions.InstitutionException;
@@ -17,7 +18,6 @@ import com.estg.core.exceptions.PickingMapException;
 import com.estg.core.exceptions.VehicleException;
 import com.estg.pickingManagement.Route;
 import com.estg.pickingManagement.RouteGenerator;
-import com.estg.pickingManagement.Vehicle;
 import io.ImporterImpl;
 
 import java.io.FileNotFoundException;
@@ -62,7 +62,7 @@ public class Menus {
         String aidcode = "";
         String lixo = "";
         boolean aidBoxFound = false;
-        while (!aux || inputNum != 4) {
+        while (!aux || inputNum != 5) {
             System.out.println("================================");
             System.out.println("|       MENU SELECTION         |");
             System.out.println("================================");
@@ -83,17 +83,16 @@ public class Menus {
             }
             switch (inputNum) {
                 case 1:
-                    //ManageAidboxesMenu();
+                    this.ManageAidboxesMenu();
                     break;
                 case 2:
-                    //ManageVehiclesMenu(); // Ver comentarios
+                    this.ManageVehiclesMenu();
                     break;
                 case 3:
                     this.ImportDataMenu();
                     break;
-
                 case 4:
-                    //generateRoutesMenu(); // Fazer
+                    this.generateRoutesMenu(this.institution);
                     break;
                 case 5:
                     return;
@@ -105,52 +104,53 @@ public class Menus {
         }
     }
 
-        /**
-         * Método responsável por exibir o menu de importação de dados e gerência a
-         * importação de dados para a instituição
-         *
-         * @throws AidBoxException se ocorrer um erro em relação aos aidboxes.
-         * @throws ContainerException se ocorrer um erro em relaçao aos containers.
-         */
-        private void ImportDataMenu() {
-            try {
-                this.importer.importData(this.institution);
-            } catch (FileNotFoundException ex) {
-                System.out.println(ex.getMessage());
-            } catch (IOException ex) {
-                System.out.println(ex.getMessage());
-            } catch (InstitutionException ex) {
-                System.out.println(ex.getMessage());
-            }
-            System.out.println("Data Imported Successfully!");
+    /**
+     * Método responsável por exibir o menu de importação de dados e gerência a
+     * importação de dados para a instituição
+     *
+     * @throws AidBoxException    se ocorrer um erro em relação aos aidboxes.
+     * @throws ContainerException se ocorrer um erro em relaçao aos containers.
+     */
+    private void ImportDataMenu() {
+        try {
+            this.importer.importData(this.institution);
+        } catch (FileNotFoundException ex) {
+            System.out.println(ex.getMessage());
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        } catch (InstitutionException ex) {
+            System.out.println(ex.getMessage());
         }
+        System.out.println("Data Imported Successfully!");
+    }
 
-        /**
-         * Método responsável por exibir o menu de gerenciamento de aidboxes e
-         * gerencia as operações relacionadas a aidboxes.
-         *
-         * @throws AidBoxException se ocorrer um erro relacionado aos aidboxes.
-         * @throws ContainerException se ocorrer um erro relacionado aos containers.
-         */
-        public void ManageAidboxesMenu () throws AidBoxException, ContainerException {
-            Scanner input = new Scanner(System.in);
-            boolean aux = false;
-            int inputNum = 0;
-            String aidcode = "";
-            String lixo = "";
-            boolean aidBoxFound = false;
-            while (!aux || inputNum != 4) {
-                System.out.println("+===================================+");
-                System.out.println("|       MANAGE AIDBOXES           |");
-                System.out.println("+===================================+");
-                System.out.println("| Options:                         |");
-                System.out.println("|   1. Add Aidbox                  |");
-                System.out.println("|   2. Add Container               |");
-                System.out.println("|   3. List Containers             |");
-                System.out.println("|   4. Exit                        |");
-                System.out.println("+===================================+");
-                System.out.print("Enter your option: ");
-            }
+    /**
+     * Método responsável por exibir o menu de gerenciamento de aidboxes e
+     * gerencia as operações relacionadas a aidboxes.
+     *
+     * @throws AidBoxException se ocorrer um erro relacionado aos aidboxes.
+     */
+    private void ManageAidboxesMenu() throws AidBoxException, ContainerException {
+        Scanner input = new Scanner(System.in);
+        boolean aux = false;
+        int inputNum = 0;
+        String aidcode = "";
+        int code = 0;
+        String zone = "";
+        String lixo = "";
+        boolean aidBoxFound = false;
+        while (!aux || inputNum != 4) {
+            System.out.println("+===================================+");
+            System.out.println("|       MANAGE AIDBOXES            |");
+            System.out.println("+===================================+");
+            System.out.println("| Options:                         |");
+            System.out.println("|   1. Add Aidbox                  |");
+            System.out.println("|   2. Add Container               |");
+            System.out.println("|   3. List Containers             |");
+            System.out.println("|   4. Exit                        |");
+            System.out.println("+===================================+");
+            System.out.print("Enter your option: ");
+
             try {
                 inputNum = input.nextInt();
                 aux = true;
@@ -160,132 +160,216 @@ public class Menus {
             }
             switch (inputNum) {
                 case 1:
-                    aidbox = new AidBoxImpl();
-                    institution.addAidBox(this.aidbox);
-                    break;
-                case 2:
-                    for (int i = 0; i < institution.getAidBoxes().length; i++) {
-                        if (institution.getAidBoxes()[i] != null) {
-                            System.out.println("Enter the aidbox code: ");
-                            aidcode = input.next();
-                            if (institution.getAidBoxes()[i].getCode().compareTo(aidcode) == 0) {
-                                aidBoxFound = true;
-                                ContainerImpl container = new ContainerImpl();
-                                try {
-                                    institution.getAidBoxes()[i].addContainer(container);
-                                    System.out.println("Container added successfully.");
-                                } catch (ContainerException e) {
-                                    System.out.println("Failed to add container: " + e.getMessage());
+                    boolean codeExists = true;
+                    while (codeExists) {
+                        System.out.println("Enter the AidBox Code: ");
+                        try {
+                            code = input.nextInt();
+                            aidcode = "CAIXF" + code;
+                            codeExists = false;
+                            for (int i = 0; i < institution.getAidBoxes().length; i++) {
+                                if (institution.getAidBoxes()[i] != null && institution.getAidBoxes()[i].getCode().compareTo(aidcode) == 0) {
+                                    System.out.println("Code already exists. Please enter a different code.");
+                                    codeExists = true;
+                                    break;
                                 }
-                                break;
                             }
+                        } catch (InputMismatchException ex) {
+                            System.out.println("Invalid character.");
+                            lixo = input.nextLine(); //clear buffer
+                            codeExists = true;
                         }
                     }
 
-                    if (!aidBoxFound) {
-                        System.out.println("Aidbox with the given code not found.");
+                    System.out.println("Enter the AidBox Zone: ");
+                    try {
+                        zone = input.next();
+                    } catch (InputMismatchException ex) {
+                        System.out.println("Invalid character.");
+                        lixo = input.nextLine(); //clear buffer
+                    }
+                    aidbox = new AidBoxImpl(aidcode, zone);
+                    institution.addAidBox(this.aidbox);
+                    break;
+                case 2:
+                    boolean aidboxExists = true;
+                    int typeChoice = -1;
+                    ContainerType ct;
+                    int containerCapacity = 0;
+                    String containerCode = "";
+                    boolean codeValid = false;
+
+                    while (aidboxExists) {
+                        System.out.println("Enter the AidBox Code: ");
+                        try {
+                            String aidboxCode = input.next();
+                            aidboxExists = false;
+                            for (int i = 0; i < institution.getAidBoxes().length; i++) {
+                                if (institution.getAidBoxes()[i] != null && institution.getAidBoxes()[i].getCode().compareTo(aidboxCode) == 0) {
+                                    System.out.println("Select one of the above container types: ");
+                                    for (int j = 0; j < TypesManagement.getTypes().length; j++) {
+                                        System.out.println("" + j + ":\t" + TypesManagement.getTypes()[j]);
+                                    }
+                                    while (typeChoice < 0 || typeChoice >= TypesManagement.getTypes().length) {
+                                        try {
+                                            typeChoice = input.nextInt();
+                                        } catch (InputMismatchException ex) {
+                                            System.out.println("Invalid character.");
+                                            input.nextLine(); //clear buffer
+                                        }
+                                    }
+                                    ct = TypesManagement.getContainerTypes()[typeChoice];
+
+                                    System.out.println("Enter the containers Capacity: ");
+                                    try {
+                                        containerCapacity = input.nextInt();
+                                    } catch (InputMismatchException ex) {
+                                        System.out.println("Invalid number.");
+                                        input.nextLine(); //clear buffer
+                                    }
+
+                                    System.out.println("Enter the container Code: ");
+                                    try {
+                                        containerCode = input.next();
+                                        codeValid = false;
+                                        for (int j = 0; j < institution.getAidBoxes().length; j++) {
+                                            for (int k = 0; k < institution.getAidBoxes()[j].getContainers().length; k++) {
+                                                if (institution.getAidBoxes()[j].getContainers()[k] != null && institution.getAidBoxes()[j].getContainers()[k].getCode().compareTo(containerCode) == 0) {
+                                                    System.out.println("Code already exists. Please enter a different code.");
+                                                    codeValid = true;
+                                                    break;
+                                                }
+                                            }
+                                            if (codeValid) {
+                                                break;
+                                            }
+                                        }
+                                    } catch (InputMismatchException ex) {
+                                        System.out.println("Invalid character.");
+                                        input.nextLine(); //clear buffer
+                                        codeValid = true;
+                                    }
+
+                                    if (!codeValid) {
+                                        ContainerImpl container = new ContainerImpl(ct, containerCapacity, containerCode);
+                                        for (int j = 0; j < institution.getAidBoxes().length; j++) {
+                                            if (institution.getAidBoxes()[i] != null && institution.getAidBoxes()[i].getCode().compareTo(aidboxCode) == 0) {
+                                                institution.getAidBoxes()[i].addContainer(container);
+                                                break;
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    continue;
+                                }
+                            }
+                        } catch (InputMismatchException ex) {
+                            System.out.println("Invalid character.");
+                            input.nextLine(); //clear buffer
+                            aidboxExists = true;
+                        }
                     }
                     break;
                 case 3:
-                    for (int i = 0; i < institution.getAidBoxes().length; i++) {
-                        if (institution.getAidBoxes()[i] != null) {
-                            if (institution.getAidBoxes()[i].getCode().compareTo(aidcode) == 0) {
-                                aidBoxFound = true;
-                                boolean hasContainers = false;
-                                for (int j = 0; j < institution.getAidBoxes()[i].getContainers().length; j++) {
-                                    if (institution.getAidBoxes()[i].getContainers()[j] != null) {
-                                        System.out.println(institution.getAidBoxes()[i].getContainers()[j].toString());
-                                        hasContainers = true;
-                                    }
-                                }
-                                if (!hasContainers) {
-                                    System.out.println("There are no containers in this aidbox.");
-                                }
-                                break;
-                            }
+                    int counter = 0;
+
+                    for (int i = 0; i < this.institution.getAidBoxes().length; i++) {
+                        for (int j = 0; j < this.institution.getAidBoxes()[i].getContainers().length; j++) {
+                            System.out.println("" + counter + "- " + this.institution.getAidBoxes()[i].getContainers()[j].toString());
+                            counter++;
+                            System.out.println("\n");
                         }
+                        System.out.println("\n");
                     }
-                    if (!aidBoxFound) {
-                        System.out.println("Aidbox with the given code not found.");
-                    }
-                    break;
+
                 case 4:
                     break;
                 default:
                     System.out.println("Invalid option. Please enter a number between 1 and 4.");
                     break;
             }
-            input.close();
         }
-
-
-        public void ManageVehiclesMenu () throws VehicleException {
-            Scanner input = new Scanner(System.in);
-            boolean aux = false;
-            int inputNum = 0;
-            double capacity = 0.0;
-            String lixo = "";
-            boolean aidBoxFound = false;
-            TypesManagement type = new TypesManagement();
-            char vType = ' ';
-
-            while (!aux || inputNum != 3) {
-                System.out.println("+===================================+");
-                System.out.println("|       MANAGE VEHICLES           |");
-                System.out.println("+===================================+");
-                System.out.println("| Options:                         |");
-                System.out.println("|   1. Add Vehicle                 |");
-                System.out.println("|   2. Create Vehicle              |");
-                System.out.println("|   3. Exit                        |");
-                System.out.println("+===================================+");
-                System.out.print("Enter your option: ");
-                try {
-                    inputNum = input.nextInt();
-                    aux = true;
-                } catch (InputMismatchException ex) {
-                    System.out.println("Opção Inválida");
-                    lixo = input.nextLine(); //limpar o buffer
-                }
-                switch (inputNum) {
-                    case 1:
-                        vehicle = new VehicleImpl();
-                        institution.addVehicle(vehicle);
-                        break;
-                    case 2:
-                        System.out.println("Enter the vehicle capacity: (Kg)");
-                        try {
-                            capacity = input.nextDouble();
-                        } catch (InputMismatchException ex) {
-                            System.out.println("Invalid capacity value. Please enter a numeric value.");
-                            lixo = input.nextLine(); // limpa o buffer
-                            continue;
-                        }
-                        System.out.print("Enter the type of vehicle: ");
-                        lixo = input.nextLine(); // limpa o buffer
-                        String vehicleType = input.nextLine();
-
-                        ContainerType containerType = TypesManagement.findByType(vehicleType);
-
-                        if (containerType == null) {
-                            System.out.println("Invalid vehicle type, please enter a valid type.");
-                            continue;
-                        }
-                        //Vehicle createdVehicle = new VehicleImpl(capacity, containerType); // Corrigir construtores
-                        //institution.addVehicle(createdVehicle);
-                        //System.out.println("Vehicle created successfully!");
-                        break;
-                    case 3:
-                        aux = true;
-                        break;
-                    default:
-                        System.out.println("Invalid option. Please enter a number between 1 and 3.");
-                        break;
-                }
-                input.close();
-            }
-
-        }
-
 
     }
+
+
+    private void ManageVehiclesMenu() throws VehicleException {
+        Scanner input = new Scanner(System.in);
+        boolean aux = false;
+        int inputNum = 0;
+        double capacity = 0.0;
+        String lixo = "";
+        boolean aidBoxFound = false;
+        TypesManagement type = new TypesManagement();
+        char vType = ' ';
+
+        while (!aux || inputNum != 3) {
+            System.out.println("+===================================+");
+            System.out.println("|       MANAGE VEHICLES           |");
+            System.out.println("+===================================+");
+            System.out.println("| Options:                         |");
+            System.out.println("|   1. Enable Vehicle              |");
+            System.out.println("|   2. Disable Vehicle             |");
+            System.out.println("|   3. Exit                        |");
+            System.out.println("+===================================+");
+            System.out.print("Enter your option: ");
+            try {
+                inputNum = input.nextInt();
+                aux = true;
+            } catch (InputMismatchException ex) {
+                System.out.println("Opção Inválida");
+                lixo = input.nextLine(); //limpar o buffer
+            }
+            switch (inputNum) {
+                case 1:
+                    int counter = 0;
+                    int option = -1;
+                    System.out.println("Select the vehicle to enable: ");
+                    for (int i = 0; i < institution.getVehicles().length; i++) {
+                        System.out.println("" + counter + "-\t" + this.institution.getVehicles()[i].toString());
+                        counter++;
+                    }
+                    try {
+                        option = input.nextInt();
+                    } catch (InputMismatchException ex) {
+                        System.out.println("Invalid character.");
+                        input.nextLine(); //clear buffer
+                    }
+                    institution.enableVehicle(institution.getVehicles()[option]);
+                    System.out.println("Vehicle successfully enabled!");
+                    break;
+                case 2:
+                    counter = 0;
+                    option = -1;
+                    System.out.println("Select the vehicle to enable: ");
+                    for (int i = 0; i < institution.getVehicles().length; i++) {
+                        System.out.println("" + counter + "-\t" + this.institution.getVehicles()[i].toString());
+                        counter++;
+                    }
+                    try {
+                        option = input.nextInt();
+                    } catch (InputMismatchException ex) {
+                        System.out.println("Invalid character.");
+                        input.nextLine(); //clear buffer
+                    }
+                    institution.disableVehicle(institution.getVehicles()[option]);
+                    System.out.println("Vehicle successfully Disabled!");
+                    break;
+                case 3:
+                    aux = true;
+                    break;
+                default:
+                    System.out.println("Invalid option. Please enter a number between 1 and 3.");
+                    break;
+            }
+        }
+
+    }
+
+    private void generateRoutesMenu(Institution instn) {
+        this.rg.generateRoutes(instn);
+    }
+
+
+}
 
